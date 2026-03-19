@@ -1,0 +1,8 @@
+{
+  "prompt": "Opprett produktet \"Analyserapport\" med produktnummer 3637. Prisen er 31900 kr eksklusiv MVA, og standard MVA-sats på 25 % skal nyttast.",
+  "files": [],
+  "tripletex_credentials": {
+    "base_url": "https://tx-proxy-jwanbnu3pq-lz.a.run.app/v2",
+    "session_token": "OVk76z34cLDIIfwPpz3hsiyGjIo7zrldRjEKTMy1_uo"
+  }
+}

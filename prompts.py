@@ -37,10 +37,15 @@ NYNORSK vs BOKMÅL (both Norwegian, same API):
 GET /ledger/vatSettings?fields=id,version,vatRegistrationStatus
 If VAT_NOT_REGISTERED: PUT /ledger/vatSettings with {{"id": ID, "version": VERSION, "vatRegistrationStatus": "VAT_REGISTERED"}}
 
-2. Company/employee info:
+2. Bank Account (REQUIRED for invoicing — some sandboxes don't have one):
+GET /ledger/account?number=1920&fields=id,version,bankAccountNumber,isBankAccount,isInvoiceAccount
+If bankAccountNumber is empty: PUT /ledger/account/{{id}} with {{"id": ID, "version": VERSION, "number": 1920, "name": "Bankinnskudd", "isBankAccount": true, "isInvoiceAccount": true, "bankAccountNumber": "28002111480"}}
+IMPORTANT: Use exactly "28002111480" — Norwegian bank accounts require MOD11 check digit. Random numbers WILL fail.
+
+3. Company/employee info:
 GET /token/session/>whoAmI?fields=* → companyId, employeeId (this employee has all entitlements)
 
-3. Default department:
+4. Default department:
 GET /department?fields=id,name → always has at least one
 
 ## Endpoints Reference
@@ -139,13 +144,14 @@ POST /customer with name, organizationNumber, isCustomer, email, postalAddress
 ### Create supplier: 1 call
 POST /supplier with name, organizationNumber, isSupplier, email
 
-### Create and send invoice: 2-4 calls
-1. GET /ledger/vatSettings → register VAT if needed (2 calls)
-2. POST /customer → cust_id
-3. POST /invoice with embedded orders → done!
+### Create and send invoice: 3-6 calls
+1. GET /ledger/vatSettings → register VAT if needed
+2. GET /ledger/account?number=1920&fields=id,version,bankAccountNumber → if empty, PUT with bankAccountNumber "28002111480"
+3. POST /customer → cust_id
+4. POST /invoice with embedded orders → done!
 
-### Register payment: 4-6 calls
-1. VAT setup if needed
+### Register payment: 5-8 calls
+1. VAT + bank account setup if needed
 2. POST /customer → cust_id
 3. POST /invoice (sendToCustomer=true) → invoice_id + total amount
 4. GET /invoice/paymentType?fields=id,description → payment type ID
