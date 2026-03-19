@@ -12,7 +12,7 @@ from agent import run_agent
 
 load_dotenv()
 
-REQUESTS_DIR = os.path.join(os.path.dirname(__file__), "requests")
+REQUESTS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "requests")
 os.makedirs(REQUESTS_DIR, exist_ok=True)
 
 logging.basicConfig(
@@ -35,10 +35,23 @@ def save_request(body: dict) -> str:
 
 @app.post("/solve")
 async def solve(request: Request):
-    body = await request.json()
-    prompt = body["prompt"]
+    raw_body = await request.body()
+    logger.info(f"Received {len(raw_body)} bytes")
+    print(raw_body)
+
+    try:
+        body = json.loads(raw_body)
+    except json.JSONDecodeError as e:
+        logger.error(f"Invalid JSON ({e}). Raw body (first 500 chars): {raw_body[:500]}")
+        return JSONResponse({"status": "completed"}, status_code=200)
+
+    prompt = body.get("prompt")
+    if not prompt:
+        logger.error(f"No prompt in request body. Keys: {list(body.keys())}")
+        return JSONResponse({"status": "completed"}, status_code=200)
+
     files = body.get("files", [])
-    credentials = body["tripletex_credentials"]
+    credentials = body.get("tripletex_credentials", {})
 
     filepath = save_request(body)
     logger.info(f"=== New task received ===")
