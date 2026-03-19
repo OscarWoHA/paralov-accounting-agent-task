@@ -58,6 +58,7 @@ Practical required: firstName, lastName, userType, dateOfBirth, department (ref)
 
 userType: "STANDARD" (limited), "EXTENDED" (full access, needed for admin), "NO_ACCESS"
 isContact: false (default) = employee, true = contact person
+If dateOfBirth is NOT provided in the task prompt, use "1990-01-01" as default.
 
 Update: GET /employee/{{id}}?fields=id,version,firstName,lastName,dateOfBirth then PUT /employee/{{id}}
 
@@ -82,8 +83,8 @@ Same address format as customer. An entity can be BOTH customer and supplier.
 
 ### Products (produkt/product/producto/Produkt/produit)
 POST /product — required: name
-{{"name": "Konsulenttime", "priceExcludingVatCurrency": 1500.00}}
-"varenummer" = number field (string). isStockItem: false = service (tjeneste), true = physical product.
+{{"name": "Konsulenttime", "number": "1001", "priceExcludingVatCurrency": 1500.00, "vatType": {{"id": 3}}}}
+"varenummer" = number field (string). Include vatType 3 if task mentions MVA/VAT. isStockItem: false = service, true = physical.
 
 ### Invoices (faktura/invoice/factura/fatura/Rechnung/facture)
 POST /invoice?sendToCustomer=true — embedded orders with orderLines:
@@ -154,9 +155,9 @@ POST /supplier with name, organizationNumber, isSupplier, email
 ### Register payment: 5-8 calls
 1. VAT + bank account setup if needed
 2. POST /customer → cust_id
-3. POST /invoice (sendToCustomer=true) → invoice_id + total amount
+3. POST /invoice (sendToCustomer=true) → invoice_id. Read "amount" from response (this is total INCLUDING VAT)
 4. GET /invoice/paymentType?fields=id,description → payment type ID
-5. PUT /invoice/{{id}}/:payment?paymentDate={today}&paymentTypeId=PT_ID&paidAmount=TOTAL
+5. PUT /invoice/{{id}}/:payment?paymentDate={today}&paymentTypeId=PT_ID&paidAmount=AMOUNT_FROM_STEP_3
 
 ### Create employee: 2-3 calls
 1. GET /department?fields=id → dept_id
@@ -184,6 +185,11 @@ PUT /invoice/{{id}}/:createCreditNote?date={today}
 
 ### Reverse voucher: find + 1 call
 PUT /ledger/voucher/{{id}}/:reverse
+
+### Create multiple departments: N+1 calls
+1. GET /department?fields=id,departmentNumber → find existing departments and highest number
+2. POST /department for each, using incrementing departmentNumber starting ABOVE the highest existing number
+Example for 3 depts: if highest existing is 1, use 2, 3, 4.
 
 ## Critical Rules
 1. NEVER set "id" on new objects.
