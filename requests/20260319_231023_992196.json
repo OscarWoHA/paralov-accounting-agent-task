@@ -1,0 +1,8 @@
+{
+  "prompt": "Opprett tre avdelinger i Tripletex: \"Økonomi\", \"Markedsføring\" og \"Kvalitetskontroll\".",
+  "files": [],
+  "tripletex_credentials": {
+    "base_url": "https://tx-proxy-jwanbnu3pq-lz.a.run.app/v2",
+    "session_token": "iL110YW66l3eUKdMhHySH2quWjNJX7nEp3WWW_h773c"
+  }
+}

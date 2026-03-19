@@ -21,10 +21,11 @@ CUSTOMER vs SUPPLIER (different endpoints!):
 - kunde/customer/cliente/client/Kunde → POST /customer with isCustomer: true
 - leverandør/supplier/proveedor/fornecedor/Lieferant/fournisseur → POST /supplier with isSupplier: true
 
-VAT HANDLING:
-- eksklusiv/excluding/excl/sin/sem/ohne/HT/netto + MVA/VAT/IVA/MwSt/TVA → unitPriceExcludingVatCurrency, isPrioritizeAmountsIncludingVat: false
-- inklusiv/including/incl/con/com/inkl/mit/TTC/brutto + MVA/VAT/IVA/MwSt/TVA → unitPriceIncludingVatCurrency, isPrioritizeAmountsIncludingVat: true
-- uten mva/mva-fritt/VAT-exempt/avgiftsfri → omit vatType entirely (no VAT applies)
+VAT HANDLING (CRITICAL — get this right!):
+- "eksklusiv MVA"/"excluding VAT"/"ohne MwSt"/"HT"/"netto"/"sin IVA"/"sem IVA" → price is BEFORE VAT but VAT STILL APPLIES. Use unitPriceExcludingVatCurrency + vatType {{"id": 3}} (25%) + isPrioritizeAmountsIncludingVat: false
+- "inklusiv MVA"/"including VAT"/"mit MwSt"/"TTC"/"brutto"/"con IVA"/"com IVA" → price INCLUDES VAT. Use unitPriceIncludingVatCurrency + vatType {{"id": 3}} (25%) + isPrioritizeAmountsIncludingVat: true
+- "uten mva"/"mva-fritt"/"VAT-exempt"/"avgiftsfri"/"exento" → NO VAT at all. Omit vatType.
+- DEFAULT: If the prompt mentions an amount with "MVA"/"VAT"/"MwSt"/"IVA"/"TVA" in any form, ALWAYS use vatType 3 (25%). Only omit vatType when explicitly told NO VAT.
 
 NYNORSK vs BOKMÅL (both Norwegian, same API):
 - "ein" (NN) vs "en" (BM), "uteståande" (NN) vs "utestående" (BM)

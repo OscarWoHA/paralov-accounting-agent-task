@@ -1,0 +1,8 @@
+{
+  "prompt": "Opprett tre avdelingar i Tripletex: \"Økonomi\", \"Administrasjon\" og \"Innkjøp\".",
+  "files": [],
+  "tripletex_credentials": {
+    "base_url": "https://tx-proxy-jwanbnu3pq-lz.a.run.app/v2",
+    "session_token": "MVHguGKWXikdsMuDLzJIMQX9Pq-LDSdSFWoNuyKBqcM"
+  }
+}
