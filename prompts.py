@@ -60,11 +60,14 @@ userType: "STANDARD" (limited), "EXTENDED" (full access, needed for admin), "NO_
 isContact: false (default) = employee, true = contact person
 If dateOfBirth is NOT provided in the task prompt, use "1990-01-01" as default.
 
-Update: GET /employee/{{id}}?fields=id,version,firstName,lastName,dateOfBirth then PUT /employee/{{id}}
+Update: PUT /employee/{{id}} — only needs id, version, firstName, lastName + changed fields. Partial updates work.
+IMPORTANT: Employee EMAIL is IMMUTABLE — cannot be changed via PUT (tied to Visma Connect).
+Contacts (isContact: true) do NOT need department or dateOfBirth — only firstName, lastName.
 
 ### Employee Start Date
 POST /employee/employment
-{{"employee": {{"id": EMP_ID}}, "startDate": "YYYY-MM-DD", "isMainEmployer": true, "taxDeductionCode": "loennFraHovedarbeidsgiver", "employmentDetails": [{{"date": "YYYY-MM-DD", "employmentType": "NOT_CHOSEN", "employmentForm": "NOT_CHOSEN", "remunerationType": "NOT_CHOSEN", "workingHoursScheme": "NOT_CHOSEN", "percentageOfFullTimeEquivalent": 100.0}}]}}
+{{"employee": {{"id": EMP_ID}}, "startDate": "YYYY-MM-DD", "isMainEmployer": true, "taxDeductionCode": "loennFraHovedarbeidsgiver", "employmentDetails": [{{"date": "YYYY-MM-DD", "employmentType": "ORDINARY", "employmentForm": "PERMANENT", "remunerationType": "MONTHLY_WAGE", "workingHoursScheme": "NOT_SHIFT", "percentageOfFullTimeEquivalent": 100.0}}]}}
+Do NOT include maritimeEmployment. Do NOT use invalid occupationCode values.
 
 ### Employee Roles (entitlements)
 "customer" field in entitlement = COMPANY_ID (from whoAmI), not a customer!
@@ -75,6 +78,8 @@ Project manager: entitlementId 45 (AUTH_CREATE_PROJECT, prerequisite) then entit
 POST /customer — isCustomer: true (MUST set explicitly, defaults to false!)
 {{"name": "Firma AS", "organizationNumber": "123456789", "isCustomer": true, "email": "post@firma.no", "postalAddress": {{"addressLine1": "Gate 1", "postalCode": "0001", "city": "Oslo"}}}}
 Address uses "postalAddress" (NOT "address"!). Also: physicalAddress (besøksadresse), deliveryAddress (leveringsadresse).
+Update: PUT /customer/{{id}} — only needs id, version, name + changed fields. Partial updates work.
+isPrivateIndividual: true for private individuals (not companies).
 
 ### Suppliers (leverandør/supplier/proveedor/fornecedor/Lieferant/fournisseur)
 POST /supplier — isSupplier: true (MUST set explicitly!)
@@ -90,7 +95,13 @@ POST /product — required: name
 POST /invoice?sendToCustomer=true — embedded orders with orderLines:
 {{"invoiceDate": "{today}", "invoiceDueDate": "{today}", "orders": [{{"customer": {{"id": CUST_ID}}, "orderDate": "{today}", "deliveryDate": "{today}", "isPrioritizeAmountsIncludingVat": false, "orderLines": [{{"description": "Service", "count": 1, "unitPriceExcludingVatCurrency": 28900, "vatType": {{"id": 3}}}}]}}]}}
 
-vatType 3 = 25% MVA (only after VAT registration). Omit vatType if task says "uten mva"/"mva-fritt"/exempt.
+VAT type IDs for order lines (MUST use OUTPUT codes, not input):
+- vatType 3 = 25% (høy sats / standard) — most common
+- vatType 31 = 15% (middels sats / food products)
+- vatType 32 = 12% (lav sats / transport, cinema, hotels)
+- Omit vatType = 0% (no VAT). Use for "uten mva"/"mva-fritt"/exempt.
+Only works after VAT registration. Do NOT use input VAT codes (1, 11, 12) on order lines.
+Discount on order line: "discount": 10 = 10% discount.
 sendToCustomer=true is default (auto-sends). Set false to create without sending.
 
 ### Payments (betaling/payment/pago/pagamento/Zahlung/paiement)
@@ -109,9 +120,16 @@ Types: SOFT_REMINDER, REMINDER, NOTICE_OF_DEBT_COLLECTION, DEBT_COLLECTION
 
 ### Travel Expenses (reiseregning/reiserekning/travel expense/Reisekosten/note de frais)
 POST /travelExpense — minimal: {{"employee": {{"id": EMP_ID}}, "title": "Reise til Oslo"}}
-Can embed costs inline. Add costs separately: POST /travelExpense/cost
+With travel details: add "travelDetails": {{"isForeignTravel": false, "isDayTrip": true, "departureDate": "YYYY-MM-DD", "returnDate": "YYYY-MM-DD", "departureFrom": "Bergen", "destination": "Oslo", "departureTime": "07:00", "returnTime": "20:00", "purpose": "Kundemøte"}}
+IMPORTANT: isForeignTravel must be explicitly set to true for foreign travel — NOT auto-detected from destination.
+Add costs: GET /travelExpense/paymentType → get payment type ID, then POST /travelExpense/cost with {{"travelExpense": {{"id": TE_ID}}, "paymentType": {{"id": PT_ID}}, "costCategory": {{"id": CAT_ID}}, "date": "YYYY-MM-DD", "amountCurrencyIncVat": 350.00, "comments": "Taxi"}}
+Cost categories: GET /travelExpense/costCategory (Hotell, Fly, Taxi, Drivstoff, etc.). Use "comments" NOT "description" on costs.
+Mileage: POST /travelExpense/mileageAllowance with rateType ref, date, departureLocation, destination, km. Get rateType from GET /travelExpense/rateCategory?type=MILEAGE_ALLOWANCE
+Per diem: POST /travelExpense/perDiemCompensation with rateType ref, location, count. Rate categories must be date-valid for the expense date.
+Accommodation: POST /travelExpense/accommodationAllowance with rateType ref, location, count.
 DELETE /travelExpense/{{id}} → 204 on success
 "utlegg" (expense reimbursement) also uses /travelExpense endpoint.
+NOTE: Requires WAGE module. If travel expense fails with permission error, activate: POST /company/salesmodules {{"name": "SMART_WAGE"}}
 
 ### Projects (prosjekt/project/proyecto/projeto/Projekt/projet)
 POST /project — required: name, projectManager (ref), startDate
@@ -128,7 +146,8 @@ POST /company/salesmodules — name is STRING enum: "SMART_PROJECT", "SMART_WAGE
 Note: Department accounting (avdelingsregnskap) is NOT a sales module — it's moduledepartment boolean on Company.
 
 ### Vouchers & Corrections (bilag/voucher)
-POST /ledger/voucher — create voucher with postings
+POST /ledger/voucher — create voucher with postings. Postings MUST have explicit "row" numbers starting at 1.
+Example: {{"date": "{today}", "description": "Manual entry", "postings": [{{"row": 1, "date": "{today}", "amountGross": 1000, "account": {{"id": ACCT_ID}}}}, {{"row": 2, "date": "{today}", "amountGross": -1000, "account": {{"id": ACCT_ID2}}}}]}}
 PUT /ledger/voucher/{{id}}/:reverse — REVERSE a voucher (preferred correction method)
 DELETE /ledger/voucher/{{id}} — only works for LAST voucher in sequence
 For invoices: use credit notes (PUT /:createCreditNote), NOT delete.
@@ -193,8 +212,8 @@ Example for 3 depts: if highest existing is 1, use 2, 3, 4.
 
 ## Critical Rules
 1. NEVER set "id" on new objects.
-2. isCustomer defaults to FALSE — always set explicitly!
-3. isSupplier defaults to FALSE — always set explicitly!
+2. POST /customer auto-sets isCustomer=true. POST /supplier auto-sets isSupplier=true. But set them explicitly to be safe.
+3. For dual-role (both customer AND supplier), you MUST set the cross-flag explicitly: POST /customer with isSupplier=true.
 4. leverandør = supplier → POST /supplier. kunde = customer → POST /customer.
 5. Employee requires: userType, dateOfBirth, department, allowInformationRegistration.
 6. Project requires: startDate.

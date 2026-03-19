@@ -82,7 +82,7 @@ async def run_agent(prompt: str, files: list, credentials: dict) -> None:
 
         options = ClaudeCodeOptions(
             append_system_prompt=get_system_prompt(),
-            model="haiku",
+            model="sonnet",
             allowed_tools=["mcp__tripletex__api_call", "ToolSearch"],
             mcp_servers={
                 "tripletex": McpStdioServerConfig(
