@@ -1,0 +1,8 @@
+{
+  "prompt": "Registrer leverandøren Dalheim AS med organisasjonsnummer 892196753. E-post: faktura@dalheim.no.",
+  "files": [],
+  "tripletex_credentials": {
+    "base_url": "https://tx-proxy-jwanbnu3pq-lz.a.run.app/v2",
+    "session_token": "HzWvhFh_aSn7WMr65ZiJ9AYbMfNKnsbdW_-dRuUoz44"
+  }
+}

@@ -23,7 +23,7 @@ TOKEN = os.environ.get("TX_TOKEN", "")
 
 
 @mcp.tool()
-def api_call(method: str, endpoint: str, params: dict | None = None, body: dict | None = None) -> str:
+def api_call(method: str, endpoint: str, params: dict | None = None, body: dict | list | None = None) -> str:
     """Make an HTTP request to the Tripletex accounting API.
 
     Args:

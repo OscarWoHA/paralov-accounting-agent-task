@@ -1,0 +1,8 @@
+{
+  "prompt": "We have a new employee named Ella Harris, born 21. October 1981. Please create them as an employee with email ella.harris@example.org and start date 28. May 2026.",
+  "files": [],
+  "tripletex_credentials": {
+    "base_url": "https://tx-proxy-jwanbnu3pq-lz.a.run.app/v2",
+    "session_token": "7vp8pCcjKNZMP_Ig8ZlwsOueJQsHHeq9r_PrgWPBgc0"
+  }
+}

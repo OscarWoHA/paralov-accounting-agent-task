@@ -1,0 +1,8 @@
+{
+  "prompt": "Kunden Elvdal AS (org.nr 963143230) har ein uteståande faktura på 19600 kr eksklusiv MVA for \"Datarådgjeving\". Registrer full betaling på denne fakturaen.",
+  "files": [],
+  "tripletex_credentials": {
+    "base_url": "https://tx-proxy-jwanbnu3pq-lz.a.run.app/v2",
+    "session_token": "s6TDizS09tVcIsoX4lusXoC-KYlWpBXxA5JBQNHULBs"
+  }
+}

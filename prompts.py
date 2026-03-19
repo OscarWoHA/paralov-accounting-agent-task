@@ -14,239 +14,167 @@ Read the task, determine the required accounting operations, and execute them vi
 ## API Basics
 - List responses: {{"fullResultSize": N, "values": [...], "from": N, "count": N}}
 - Single entity responses: {{"value": {{...}}}}
-- Use ?fields=id,name,... to select specific fields. Use ?fields=* to see all fields on an entity.
+- Use ?fields=id,name,... to select specific fields.
 - Dates: "YYYY-MM-DD" format
 - Entity references: {{"id": N}}
-- NEVER set "id" on new objects you're creating — the API assigns IDs automatically.
-- Norwegian characters (æ, ø, å) work fine — send as UTF-8.
+- NEVER set "id" on new objects you're creating.
 - PUT with /:action endpoints use QUERY PARAMETERS, not request body.
+- PUT /path (without ID) is sometimes correct — e.g. PUT /ledger/vatSettings.
 
-## Key Endpoints
+## Sandbox Setup (do these FIRST if task involves invoicing/VAT)
+
+### 1. Register for VAT (needed for invoices with MVA/VAT)
+GET /ledger/vatSettings?fields=id,version,vatRegistrationStatus
+If VAT_NOT_REGISTERED: PUT /ledger/vatSettings with {{"id": ID, "version": VERSION, "vatRegistrationStatus": "VAT_REGISTERED"}}
+
+### 2. Get company info
+GET /token/session/>whoAmI?fields=* → gives companyId, employeeId
+
+## TESTED Endpoints (verified working)
 
 ### Employees
 POST /employee
-Required: firstName, lastName
-Optional: email, dateOfBirth, phoneNumberMobile, userType, allowInformationRegistration, isContact
-userType values: "STANDARD" (limited), "EXTENDED" (full access, needed for admin), "NO_ACCESS"
+Required: firstName, lastName, userType, dateOfBirth, department (ref), allowInformationRegistration
+Example: {{"firstName": "Ola", "lastName": "Nordmann", "email": "ola@example.no", "userType": "STANDARD", "dateOfBirth": "1990-01-01", "allowInformationRegistration": true, "department": {{"id": DEPT_ID}}}}
 
-To make someone an administrator/kontoadministrator:
-1. POST /employee with userType: "EXTENDED"
-2. PUT /employee/entitlement/:grantEntitlementsByTemplate?employeeId={{id}}&template=all_entitlements
-   (Use query params, no body needed)
+GET /department?fields=id,name → get default department (always exists)
 
-Example:
-{{"firstName": "Ola", "lastName": "Nordmann", "email": "ola@example.no", "userType": "EXTENDED", "allowInformationRegistration": true}}
+### Update Employee Contact Info
+GET /employee/{{id}}?fields=id,version,firstName,lastName,dateOfBirth → get current version
+PUT /employee/{{id}} with {{"id": ID, "version": VERSION, "firstName": "...", "lastName": "...", "dateOfBirth": "...", "department": {{"id": DEPT_ID}}, "allowInformationRegistration": true, "phoneNumberMobile": "...", "email": "..."}}
+NOTE: PUT requires dateOfBirth, department, allowInformationRegistration even when just updating other fields.
 
-GET /employee?firstName=Ola&lastName=Nordmann&fields=id,firstName,lastName,email
+### Employee Start Date (Employment)
+The start date is on the employment sub-resource, NOT on the employee:
+POST /employee/employment with:
+{{"employee": {{"id": EMP_ID}}, "startDate": "YYYY-MM-DD", "isMainEmployer": true, "taxDeductionCode": "loennFraHovedarbeidsgiver", "employmentDetails": [{{"date": "YYYY-MM-DD", "employmentType": "NOT_CHOSEN", "employmentForm": "NOT_CHOSEN", "remunerationType": "NOT_CHOSEN", "workingHoursScheme": "NOT_CHOSEN", "percentageOfFullTimeEquivalent": 100.0}}]}}
+
+### Employee Roles
+To make admin: POST /employee/entitlement with {{"employee": {{"id": EMP_ID}}, "entitlementId": 1, "customer": {{"id": COMPANY_ID}}}}
+To make PM: POST /employee/entitlement with {{"employee": {{"id": EMP_ID}}, "entitlementId": 45, "customer": {{"id": COMPANY_ID}}}} (prerequisite)
+Then: POST /employee/entitlement with {{"employee": {{"id": EMP_ID}}, "entitlementId": 10, "customer": {{"id": COMPANY_ID}}}}
+NOTE: "customer" field = COMPANY ID (from whoAmI), not a customer. Employee must have userType: "EXTENDED" for admin.
 
 ### Customers
 POST /customer
-Required: name, isCustomer (must be true)
+Required: name, isCustomer: true
 Optional: email, organizationNumber, phoneNumber, postalAddress, physicalAddress
+Address format: "postalAddress": {{"addressLine1": "Storgata 111", "postalCode": "7010", "city": "Trondheim"}}
+NOT "address" — that field doesn't exist!
 
-Example:
-{{"name": "Bergvik AS", "organizationNumber": "890733751", "isCustomer": true, "email": "post@bergvik.no"}}
-
-GET /customer?name=Bergvik&fields=id,name,organizationNumber
+### Suppliers (leverandør)
+POST /supplier
+Required: name, isSupplier: true
+Optional: email, organizationNumber, phoneNumber, postalAddress
+Example: {{"name": "Dalheim AS", "organizationNumber": "892196753", "email": "faktura@dalheim.no", "isSupplier": true}}
+IMPORTANT: "leverandør" = supplier → use POST /supplier. Do NOT use /customer for suppliers!
+"kunde" = customer → use POST /customer with isCustomer: true.
 
 ### Products
 POST /product
 Required: name
-Optional: number, priceExcludingVatCurrency, vatType
+Optional: priceExcludingVatCurrency, number
 
-VAT types (vatType.id):
-- 3 = Utgående mva høy sats 25% (standard Norwegian VAT, most common)
-- 5 = Utgående mva middels sats 15%
-- 6 = Utgående mva lav sats 12%
-- 0 or omit = No VAT
-
-Example:
-{{"name": "Systemutvikling", "priceExcludingVatCurrency": 1500.00, "vatType": {{"id": 3}}}}
-
-### Orders
-POST /order
-Required: customer (ref), orderDate, deliveryDate
-Optional: receiverEmail, invoicesDueIn, isPrioritizeAmountsIncludingVat, orderLines (can be embedded inline)
-
-OrderLine fields: description, count, unitPriceExcludingVatCurrency, vatType, product (ref or inline)
-If isPrioritizeAmountsIncludingVat is true, use unitPriceIncludingVatCurrency instead.
-
-POST /order/orderline — create order line separately
-POST /order/orderline/list — batch create order lines
-
-Example (with inline orderLines):
-{{
-  "customer": {{"id": 123}},
-  "orderDate": "{today}",
-  "deliveryDate": "{today}",
-  "isPrioritizeAmountsIncludingVat": false,
-  "orderLines": [
-    {{
-      "description": "Systemutvikling",
-      "count": 1,
-      "unitPriceExcludingVatCurrency": 28900.00,
-      "vatType": {{"id": 3}}
-    }}
-  ]
-}}
-
-### Invoices
-POST /invoice — creates invoice. By default sendToCustomer=true (auto-sends!)
-Query params: sendToCustomer (bool, default true), paymentTypeId (int), paidAmount (float)
-Required body: invoiceDate, invoiceDueDate, orders (array of order refs or full embedded orders)
-
-CRITICAL: You can embed full Order objects (with nested orderLines) directly in the POST /invoice body!
-This means you can create customer + invoice (with embedded orders) in just 2 API calls.
-
-Example (with embedded orders and orderLines — most efficient approach):
-{{
-  "invoiceDate": "{today}",
-  "invoiceDueDate": "{today}",
-  "orders": [
-    {{
-      "customer": {{"id": 123}},
-      "orderDate": "{today}",
-      "deliveryDate": "{today}",
-      "isPrioritizeAmountsIncludingVat": false,
-      "orderLines": [
-        {{
-          "description": "Systemutvikling",
-          "count": 1,
-          "unitPriceExcludingVatCurrency": 28900.00,
-          "vatType": {{"id": 3}}
-        }}
-      ]
-    }}
-  ]
-}}
-
-To send invoice separately (if sendToCustomer was false):
-PUT /invoice/{{id}}/:send?sendType=EMAIL
-
-To create invoice from existing order:
-PUT /order/{{id}}/:invoice?invoiceDate=YYYY-MM-DD&sendToCustomer=true
+### Orders & Invoices
+POST /invoice?sendToCustomer=true with embedded orders:
+{{"invoiceDate": "{today}", "invoiceDueDate": "{today}", "orders": [{{"customer": {{"id": CUST_ID}}, "orderDate": "{today}", "deliveryDate": "{today}", "isPrioritizeAmountsIncludingVat": false, "orderLines": [{{"description": "Service", "count": 1, "unitPriceExcludingVatCurrency": 28900, "vatType": {{"id": 3}}}}]}}]}}
+vatType 3 = 25% MVA. Only works after VAT registration. Omit vatType if task doesn't mention MVA/VAT.
 
 ### Payments
-Register payment on invoice:
-PUT /invoice/{{id}}/:payment?paymentDate=YYYY-MM-DD&paymentTypeId=N&paidAmount=N
-(All parameters are QUERY PARAMS, no request body)
-
-Common paymentTypeId values — you may need to GET /invoice/paymentType to find available types.
+GET /invoice/paymentType?fields=id,description → find "Betalt til bank" (incoming payment type)
+Do NOT use /ledger/paymentTypeOut — those are outgoing!
+PUT /invoice/{{id}}/:payment?paymentDate=YYYY-MM-DD&paymentTypeId=PT_ID&paidAmount=TOTAL_WITH_VAT
 
 ### Credit Notes
-PUT /invoice/{{id}}/:createCreditNote — creates credit note for an invoice
+PUT /invoice/{{id}}/:createCreditNote?date=YYYY-MM-DD → creates credit note for an invoice
 
 ### Travel Expenses
-POST /travelExpense — create travel expense
-Required fields vary by type. Common: employee (ref), title, date, amount
-GET /travelExpense?fields=* — list all travel expenses (use to discover fields)
-DELETE /travelExpense/{{id}} — delete a travel expense
-
-Related sub-resources:
-POST /travelExpense/cost — add cost to travel expense
-POST /travelExpense/mileageAllowance — add mileage allowance
-POST /travelExpense/perDiemCompensation — add per diem
+POST /travelExpense — required: employee (ref), title. That's it for minimal creation.
+{{"employee": {{"id": EMP_ID}}, "title": "Reise til Oslo"}}
+Add costs: POST /travelExpense/cost
+DELETE /travelExpense/{{id}} — returns 204 on success
 
 ### Projects
 POST /project
-Required: name, projectManager (employee ref)
-Optional: customer (ref), startDate, endDate, isClosed, number
-
-Example:
-{{"name": "Website Redesign", "projectManager": {{"id": 1}}, "customer": {{"id": 123}}}}
+Required: name, projectManager (ref), startDate
+Optional: customer (ref)
+{{"name": "My Project", "projectManager": {{"id": EMP_ID}}, "customer": {{"id": CUST_ID}}, "startDate": "{today}"}}
+NOTE: PM needs AUTH_PROJECT_MANAGER entitlement (id 10).
 
 ### Departments
-POST /department
-Required: name, departmentNumber (unique integer)
+POST /department — required: name, departmentNumber (unique int)
+{{"name": "IT-avdeling", "departmentNumber": 2}}
 
-Example:
-{{"name": "IT-avdeling", "departmentNumber": 1}}
+### Enable Accounting Modules
+POST /company/salesmodules — for enabling modules like department accounting
+The agent should try GET /company/salesmodules?fields=* first to see available modules.
 
-### Ledger / Vouchers
-GET /ledger/account?fields=id,number,name — chart of accounts
-POST /ledger/voucher — create voucher
+### Corrections / Deletions
+DELETE /travelExpense/{{id}} — delete travel expense (204 on success)
 DELETE /ledger/voucher/{{id}} — delete/reverse voucher
-GET /ledger/vatType?fields=id,number,name — list VAT types (useful for discovering vatType IDs)
+PUT /invoice/{{id}}/:createCreditNote?date=YYYY-MM-DD — reverse an invoice
 
-### Contacts
-POST /contact — create contact person for customer
-Fields: firstName, lastName, email, customer (ref), phoneNumber
+### Ledger
+GET /ledger/account?number=1920&fields=id,version,bankAccountNumber — bank account
+PUT /ledger/account/{{id}} — update account
+GET /ledger/vatType?fields=id,number,name,percentage — list VAT types
 
-### Bank Account Registration (REQUIRED before invoicing)
-Fresh sandboxes need a bank account number set on a LEDGER ACCOUNT before invoices can be created.
-The bank account is NOT on /bank (that's reference data) and NOT on /company.
-It is on /ledger/account — specifically on account 1920 (Bankinnskudd).
+## Task Patterns
 
-Steps to register:
-1. GET /ledger/account?number=1920&fields=id,version,number,name,isBankAccount,isInvoiceAccount,bankAccountNumber
-   → Find the existing account 1920, note its id and version
-2. PUT /ledger/account/{{id}}
-   Body: {{"id": ID, "version": VERSION, "number": 1920, "name": "Bankinnskudd", "isBankAccount": true, "isInvoiceAccount": true, "bankAccountNumber": "12345678901"}}
-   → This registers the bank account number on the company's chart of accounts
+### Create customer (with address)
+POST /customer with name, organizationNumber, isCustomer: true, email, postalAddress
 
-If account 1920 doesn't exist, create it:
-POST /ledger/account
-Body: {{"number": 1920, "name": "Bankinnskudd", "isBankAccount": true, "isInvoiceAccount": true, "bankAccountNumber": "12345678901"}}
-
-IMPORTANT: Do NOT use POST /bank (that's read-only bank reference data, returns 405).
-IMPORTANT: Do NOT use PUT /company/{{id}} (returns 405 through the proxy).
-
-### Company Info
-GET /token/session/>whoAmI?fields=* — get logged-in user info including companyId
-GET /company/{{id}}?fields=* — get company info
-
-## Common Task Patterns
-
-### Create and send invoice (FULL FLOW for fresh sandbox — 4 API calls)
-1. GET /ledger/account?number=1920&fields=id,version,number,name,isBankAccount,isInvoiceAccount,bankAccountNumber → get account 1920
-2. PUT /ledger/account/{{id}} with {{"id": ID, "version": VERSION, "number": 1920, "name": "Bankinnskudd", "isBankAccount": true, "isInvoiceAccount": true, "bankAccountNumber": "12345678901"}} → register bank account
-3. POST /customer with name, organizationNumber, isCustomer: true → get customer_id
-4. POST /invoice with embedded orders and orderLines (sendToCustomer=true by default) → done!
-
-### Create and send invoice (if bank account already registered — 2 calls)
-1. POST /customer → customer_id
-2. POST /invoice (with embedded orders and orderLines, sendToCustomer=true by default) → done!
-
-### Create employee with admin role
-1. POST /employee with userType: "EXTENDED", allowInformationRegistration: true
-2. PUT /employee/entitlement/:grantEntitlementsByTemplate?employeeId={{id}}&template=all_entitlements
+### Create and send invoice
+1. GET /ledger/vatSettings → register VAT if needed
+2. POST /customer → cust_id
+3. POST /invoice with embedded orders → done!
 
 ### Register payment on invoice
-1. POST /customer → customer_id
-2. POST /invoice (with embedded orders) → invoice_id
-3. PUT /invoice/{{invoice_id}}/:payment?paymentDate=YYYY-MM-DD&paymentTypeId=N&paidAmount=N
+1. VAT setup if needed
+2. POST /customer → cust_id
+3. POST /invoice (sendToCustomer=true) → invoice_id + total amount
+4. GET /invoice/paymentType?fields=id,description → payment type ID
+5. PUT /invoice/{{id}}/:payment?paymentDate={today}&paymentTypeId=PT_ID&paidAmount=TOTAL
 
-### Create project
-1. GET /employee to find/verify project manager (or POST /employee to create)
-2. POST /customer if needed
-3. POST /project with projectManager and customer refs
+### Create employee
+1. GET /department?fields=id → dept_id
+2. POST /employee → emp_id
+3. If start date mentioned: POST /employee/employment with startDate
+
+### Create employee as admin
+1. GET /department?fields=id + GET /token/session/>whoAmI?fields=companyId
+2. POST /employee (userType: "EXTENDED") → emp_id
+3. POST /employee/entitlement (entitlementId: 1, customer: company_id)
+
+### Create project with PM
+1. GET /department?fields=id + GET /token/session/>whoAmI?fields=companyId
+2. POST /customer → cust_id
+3. POST /employee (EXTENDED, dateOfBirth, department) → emp_id
+4. POST /employee/entitlement (entitlementId: 45) then (entitlementId: 10)
+5. POST /project (name, projectManager, customer, startDate)
+
+### Credit note
+1. Find/create the invoice
+2. PUT /invoice/{{id}}/:createCreditNote?date={today}
 
 ### Delete travel expense
-1. GET /travelExpense to find the expense
+1. GET /travelExpense?fields=id
 2. DELETE /travelExpense/{{id}}
 
-### Create credit note
-1. GET /invoice to find the invoice
-2. PUT /invoice/{{id}}/:createCreditNote
-
 ## Critical Rules
-1. The sandbox starts EMPTY — create all prerequisites before the main entity.
-2. NEVER set "id" on new objects being created. The API will reject it.
-3. "eksklusiv MVA" / "ex. VAT" / "excl. VAT" = the amount IS the price excluding VAT. Use directly as unitPriceExcludingVatCurrency with isPrioritizeAmountsIncludingVat: false.
-4. "inklusiv MVA" / "inc. VAT" / "incl. VAT" = divide by 1.25 to get the excluding-VAT amount (for 25% VAT), or use unitPriceIncludingVatCurrency with isPrioritizeAmountsIncludingVat: true.
-5. Always set isCustomer: true when creating customers.
-6. Reuse IDs from POST responses — never re-query something you just created.
-7. Plan ALL needed calls before starting. Execute them in the minimum number of steps.
-8. If an API call fails, read the error message carefully. Fix the issue in ONE retry. Do NOT retry the same call more than once.
-9. For dates, use today's date ({today}) unless the prompt specifies otherwise.
-10. When the prompt says "send" the invoice, make sure sendToCustomer=true (which is the default on POST /invoice).
-11. For PUT /:action endpoints, parameters go as QUERY PARAMS, not in the request body.
-12. When creating order lines, if you don't have a product ID, you can create a product inline by providing name and number in the product field.
-13. VAT type 3 (25%) is the standard for most Norwegian services and goods.
+1. NEVER set "id" on new objects.
+2. "eksklusiv MVA" = use unitPriceExcludingVatCurrency, isPrioritizeAmountsIncludingVat: false.
+3. "inklusiv MVA" = use unitPriceIncludingVatCurrency, isPrioritizeAmountsIncludingVat: true.
+4. Always set isCustomer: true for customers.
+5. Reuse IDs from POST responses — never re-query what you just created.
+6. Employee creation REQUIRES: userType, dateOfBirth, department, allowInformationRegistration.
+7. Project creation REQUIRES: startDate.
+8. Customer address uses "postalAddress": {{"addressLine1": "...", "postalCode": "...", "city": "..."}}.
+9. For PUT /:action endpoints, parameters go as QUERY PARAMS, not body.
+10. VAT type 3 (25%) only works after VAT registration.
 
-## IMPORTANT: Efficiency and Behavior Rules
-- ONLY use the mcp__tripletex__api_call tool for API calls. Do NOT use Bash, WebFetch, WebSearch, Read, Write or any other tool.
-- If something fails after 2 attempts, move on — partial credit is better than no credit.
-- NEVER spend more than 10 API calls total on a single task.
-- Plan the full sequence of calls BEFORE making the first one.
+## Efficiency Rules
+- ONLY use mcp__tripletex__api_call. No Bash/WebFetch/WebSearch/Read/Write.
+- Max 10 API calls per task. Plan all calls BEFORE starting.
+- If something fails after 2 attempts, move on.
 """
