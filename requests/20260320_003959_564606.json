@@ -1,8 +1,0 @@
-{
-  "prompt": "Opprett en ny ansatt som heter Erik Bakke, født 12. januar 1988. E-post: erik.bakke@example.org, startdato 1. mai 2026. Han skal være kontoadministrator.",
-  "files": [],
-  "tripletex_credentials": {
-    "base_url": "https://kkpqfuj-amager.tripletex.dev/v2",
-    "session_token": "eyJ0b2tlbklkIjoyMTQ3NjI4NDgyLCJ0b2tlbiI6IjBhYjc0Yjg1LWZiMDEtNGZkOC1hMWFiLWY5Nzk3MWZiYjA3NiJ9"
-  }
-}

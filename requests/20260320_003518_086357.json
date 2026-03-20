@@ -1,8 +1,0 @@
-{
-  "prompt": "Opprett ei reiserekning for den tilsette med tittelen \"Kundemøte Stavanger\". Reisa gjekk frå Bergen til Stavanger den 15. mars 2026, avreise kl. 08:00 og retur kl. 18:00. Det var ein dagstur.",
-  "files": [],
-  "tripletex_credentials": {
-    "base_url": "https://kkpqfuj-amager.tripletex.dev/v2",
-    "session_token": "eyJ0b2tlbklkIjoyMTQ3NjI4NDgyLCJ0b2tlbiI6IjBhYjc0Yjg1LWZiMDEtNGZkOC1hMWFiLWY5Nzk3MWZiYjA3NiJ9"
-  }
-}

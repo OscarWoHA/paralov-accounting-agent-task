@@ -1,0 +1,802 @@
+[
+  {
+    "id": 1,
+    "category": "Employees",
+    "language": "Norwegian Bokmal",
+    "tier": 1,
+    "prompt": "Opprett en ny ansatt med navn Kari Nordmann, e-post kari.nordmann@example.no, fødselsdato 12. mars 1990 og startdato 1. januar 2026.",
+    "expected_entities": "Employee: name=Kari Nordmann, email=kari.nordmann@example.no, dateOfBirth=1990-03-12, startDate=2026-01-01"
+  },
+  {
+    "id": 2,
+    "category": "Employees",
+    "language": "Norwegian Bokmal",
+    "tier": 1,
+    "prompt": "Registrer ansatt Ole Braten med e-post ole.braten@firma.no, født 5. juli 1985, startdato 15. mars 2026. Gjør ham til kontoadministrator.",
+    "expected_entities": "Employee: name=Ole Braten, email=ole.braten@firma.no, dateOfBirth=1985-07-05, startDate=2026-03-15, isAdmin=true"
+  },
+  {
+    "id": 3,
+    "category": "Employees",
+    "language": "Norwegian Nynorsk",
+    "tier": 1,
+    "prompt": "Opprett ein ny tilsett med namn Solveig Haugen, e-post solveig@haugen.no, fødselsdato 22. september 1992 og startdato 1. april 2026.",
+    "expected_entities": "Employee: name=Solveig Haugen, email=solveig@haugen.no, dateOfBirth=1992-09-22, startDate=2026-04-01"
+  },
+  {
+    "id": 4,
+    "category": "Employees",
+    "language": "English",
+    "tier": 1,
+    "prompt": "Create a new employee named James Thompson, email james.thompson@acme.co.uk, date of birth 3rd November 1988, start date 1st February 2026.",
+    "expected_entities": "Employee: name=James Thompson, email=james.thompson@acme.co.uk, dateOfBirth=1988-11-03, startDate=2026-02-01"
+  },
+  {
+    "id": 5,
+    "category": "Employees",
+    "language": "Spanish",
+    "tier": 1,
+    "prompt": "Crear un nuevo empleado llamado Carlos Mendoza, correo electrónico carlos.mendoza@empresa.es, fecha de nacimiento 14 de junio de 1991, fecha de inicio 1 de marzo de 2026.",
+    "expected_entities": "Employee: name=Carlos Mendoza, email=carlos.mendoza@empresa.es, dateOfBirth=1991-06-14, startDate=2026-03-01"
+  },
+  {
+    "id": 6,
+    "category": "Employees",
+    "language": "Portuguese",
+    "tier": 1,
+    "prompt": "Registre um novo funcionário chamado Ana Ferreira, e-mail ana.ferreira@techlda.pt, data de nascimento 8 de outubro de 1987, data de início 15 de fevereiro de 2026.",
+    "expected_entities": "Employee: name=Ana Ferreira, email=ana.ferreira@techlda.pt, dateOfBirth=1987-10-08, startDate=2026-02-15"
+  },
+  {
+    "id": 7,
+    "category": "Employees",
+    "language": "German",
+    "tier": 1,
+    "prompt": "Erstellen Sie einen neuen Mitarbeiter mit dem Namen Hans Müller, E-Mail hans.mueller@technik-gmbh.de, Geburtsdatum 19. Januar 1993, Startdatum 1. April 2026. Er soll Kontoadministrator sein.",
+    "expected_entities": "Employee: name=Hans Müller, email=hans.mueller@technik-gmbh.de, dateOfBirth=1993-01-19, startDate=2026-04-01, isAdmin=true"
+  },
+  {
+    "id": 8,
+    "category": "Employees",
+    "language": "French",
+    "tier": 1,
+    "prompt": "Créez un nouvel employé nommé Marie Dupont, e-mail marie.dupont@societe.fr, date de naissance le 27 mai 1989, date de début le 1er mars 2026.",
+    "expected_entities": "Employee: name=Marie Dupont, email=marie.dupont@societe.fr, dateOfBirth=1989-05-27, startDate=2026-03-01"
+  },
+  {
+    "id": 9,
+    "category": "Employees",
+    "language": "Norwegian Bokmal",
+    "tier": 1,
+    "prompt": "Oppdater ansatt Lise Berg sin kontaktinformasjon: telefonnummer 98765432, adresse Storgata 15, 0184 Oslo.",
+    "expected_entities": "Employee update: name=Lise Berg, phone=98765432, address=Storgata 15, postalCode=0184, city=Oslo"
+  },
+  {
+    "id": 10,
+    "category": "Employees",
+    "language": "Norwegian Nynorsk",
+    "tier": 1,
+    "prompt": "Opprett ein tilsett ved namn Eirik Solberg, e-post eirik.solberg@vestland.no, fødselsdato 3. februar 1994, startdato 1. mai 2026. Gjer han til kontoadministrator.",
+    "expected_entities": "Employee: name=Eirik Solberg, email=eirik.solberg@vestland.no, dateOfBirth=1994-02-03, startDate=2026-05-01, isAdmin=true"
+  },
+  {
+    "id": 11,
+    "category": "Customers & Products",
+    "language": "Norwegian Bokmal",
+    "tier": 1,
+    "prompt": "Registrer kunde Fjordtech AS med organisasjonsnummer 987654321, adresse Havnegata 5, 5003 Bergen, e-post post@fjordtech.no, telefon 55123456.",
+    "expected_entities": "Customer: name=Fjordtech AS, orgNumber=987654321, address=Havnegata 5, postalCode=5003, city=Bergen, email=post@fjordtech.no, phone=55123456, isCustomer=true"
+  },
+  {
+    "id": 12,
+    "category": "Customers & Products",
+    "language": "Norwegian Bokmal",
+    "tier": 1,
+    "prompt": "Registrer en leverandør med navn Kontorrekvisita Norge AS, organisasjonsnummer 912345678, adresse Industriveien 22, 0579 Oslo, e-post ordre@kontorrekvisita.no.",
+    "expected_entities": "Supplier: name=Kontorrekvisita Norge AS, orgNumber=912345678, address=Industriveien 22, postalCode=0579, city=Oslo, email=ordre@kontorrekvisita.no, isSupplier=true"
+  },
+  {
+    "id": 13,
+    "category": "Customers & Products",
+    "language": "Norwegian Bokmal",
+    "tier": 1,
+    "prompt": "Opprett et produkt med produktnummer 1001, navn «Kontorstol Ergo Pro», pris kr 4 500 eksklusiv MVA, med 25 % MVA-sats.",
+    "expected_entities": "Product: productNumber=1001, name=Kontorstol Ergo Pro, priceExclVat=4500, vatRate=25%"
+  },
+  {
+    "id": 14,
+    "category": "Customers & Products",
+    "language": "English",
+    "tier": 1,
+    "prompt": "Register a customer called Nordic Solutions Ltd with organization number 876543210, address 42 King Street, 0150 Oslo, email info@nordicsolutions.com, phone +47 22334455.",
+    "expected_entities": "Customer: name=Nordic Solutions Ltd, orgNumber=876543210, address=42 King Street, postalCode=0150, city=Oslo, email=info@nordicsolutions.com, phone=+47 22334455, isCustomer=true"
+  },
+  {
+    "id": 15,
+    "category": "Customers & Products",
+    "language": "English",
+    "tier": 1,
+    "prompt": "Create a product with product number 2050, name 'Premium Wireless Mouse', price NOK 899 including VAT, VAT rate 25%.",
+    "expected_entities": "Product: productNumber=2050, name=Premium Wireless Mouse, priceInclVat=899, vatRate=25% (priceExclVat=719.20)"
+  },
+  {
+    "id": 16,
+    "category": "Customers & Products",
+    "language": "Spanish",
+    "tier": 1,
+    "prompt": "Registre un proveedor llamado Suministros Ibéricos SA, número de organización 923456789, dirección Calle Mayor 10, 0252 Oslo, correo electrónico pedidos@suministros.es.",
+    "expected_entities": "Supplier: name=Suministros Ibéricos SA, orgNumber=923456789, address=Calle Mayor 10, postalCode=0252, city=Oslo, email=pedidos@suministros.es, isSupplier=true"
+  },
+  {
+    "id": 17,
+    "category": "Customers & Products",
+    "language": "German",
+    "tier": 1,
+    "prompt": "Registrieren Sie einen Kunden namens Nordlicht GmbH, Organisationsnummer 834567890, Adresse Fjordstraße 8, 7010 Trondheim, E-Mail kontakt@nordlicht.de, Telefon 73456789.",
+    "expected_entities": "Customer: name=Nordlicht GmbH, orgNumber=834567890, address=Fjordstraße 8, postalCode=7010, city=Trondheim, email=kontakt@nordlicht.de, phone=73456789, isCustomer=true"
+  },
+  {
+    "id": 18,
+    "category": "Customers & Products",
+    "language": "French",
+    "tier": 1,
+    "prompt": "Enregistrez un fournisseur nommé Fournitures Modernes SARL, numéro d'organisation 945678901, adresse 15 Rue de la Paix, 0161 Oslo, e-mail commandes@fournitures.fr.",
+    "expected_entities": "Supplier: name=Fournitures Modernes SARL, orgNumber=945678901, address=15 Rue de la Paix, postalCode=0161, city=Oslo, email=commandes@fournitures.fr, isSupplier=true"
+  },
+  {
+    "id": 19,
+    "category": "Customers & Products",
+    "language": "Portuguese",
+    "tier": 1,
+    "prompt": "Crie um produto com número de produto 3010, nome 'Monitor LED 27 polegadas', preço 6 200 kr sem IVA. A taxa de IVA é de 25%.",
+    "expected_entities": "Product: productNumber=3010, name=Monitor LED 27 polegadas, priceExclVat=6200, vatRate=25%"
+  },
+  {
+    "id": 20,
+    "category": "Customers & Products",
+    "language": "Norwegian Nynorsk",
+    "tier": 1,
+    "prompt": "Registrer ein kunde med namn Vestlandsfisk AS, organisasjonsnummer 856789012, adresse Fiskegata 3, 5804 Bergen, e-post post@vestlandsfisk.no, telefon 55667788.",
+    "expected_entities": "Customer: name=Vestlandsfisk AS, orgNumber=856789012, address=Fiskegata 3, postalCode=5804, city=Bergen, email=post@vestlandsfisk.no, phone=55667788, isCustomer=true"
+  },
+  {
+    "id": 21,
+    "category": "Invoicing",
+    "language": "Norwegian Bokmal",
+    "tier": 2,
+    "prompt": "Opprett en faktura til kunde Solvik Consulting AS (organisasjonsnummer 891234567, adresse Parkveien 33, 0258 Oslo, e-post faktura@solvik.no) på kr 25 000 eksklusiv MVA (25 %). Send fakturaen.",
+    "expected_entities": "Customer created, Invoice: customer=Solvik Consulting AS, amountExclVat=25000, vatRate=25%, amountInclVat=31250, invoice sent"
+  },
+  {
+    "id": 22,
+    "category": "Invoicing",
+    "language": "Norwegian Bokmal",
+    "tier": 2,
+    "prompt": "Registrer kunde Nordby Eiendom AS med org.nr. 867890123, adresse Strandgata 12, 3210 Sandefjord, e-post regnskap@nordby.no. Opprett og send en faktura på kr 150 000 inklusiv MVA (25 %).",
+    "expected_entities": "Customer created, Invoice: customer=Nordby Eiendom AS, amountInclVat=150000, vatRate=25%, amountExclVat=120000, invoice sent"
+  },
+  {
+    "id": 23,
+    "category": "Invoicing",
+    "language": "Norwegian Bokmal",
+    "tier": 2,
+    "prompt": "Opprett en faktura til kunde Havblikk AS (org.nr. 823456789, Sjøgata 7, 8006 Bodø, e-post post@havblikk.no) på kr 50 000 eksklusiv MVA (25 %). Send fakturaen og registrer full betaling.",
+    "expected_entities": "Customer created, Invoice created and sent, amountExclVat=50000, amountInclVat=62500, full payment registered, outstanding=0"
+  },
+  {
+    "id": 24,
+    "category": "Invoicing",
+    "language": "Norwegian Bokmal",
+    "tier": 3,
+    "prompt": "Registrer kunde Midtbyen Regnskap AS (org.nr. 845678901, Kongens gate 20, 7011 Trondheim, e-post faktura@midtbyen.no). Lag en faktura på kr 80 000 eksklusiv MVA (25 %), send den, og registrer en delbetaling på kr 40 000.",
+    "expected_entities": "Customer created, Invoice: amountExclVat=80000, amountInclVat=100000, invoice sent, partial payment=40000, outstanding=60000"
+  },
+  {
+    "id": 25,
+    "category": "Invoicing",
+    "language": "Norwegian Bokmal",
+    "tier": 3,
+    "prompt": "Opprett kunde Polar IT AS (org.nr. 878901234, Nordlysveien 2, 9008 Tromsø, e-post admin@polarit.no). Lag og send en faktura på kr 120 000 eksklusiv MVA (25 %). Opprett deretter en kreditnota for hele fakturaen.",
+    "expected_entities": "Customer created, Invoice: amountExclVat=120000, amountInclVat=150000, invoice sent, credit note created for full amount"
+  },
+  {
+    "id": 26,
+    "category": "Invoicing",
+    "language": "English",
+    "tier": 2,
+    "prompt": "Register customer Fjord Analytics Ltd, org number 812345678, address 5 Innovation Drive, 0349 Oslo, email billing@fjordanalytics.com. Create and send an invoice for NOK 35,000 excluding VAT at 25%.",
+    "expected_entities": "Customer created, Invoice: customer=Fjord Analytics Ltd, amountExclVat=35000, vatRate=25%, amountInclVat=43750, invoice sent"
+  },
+  {
+    "id": 27,
+    "category": "Invoicing",
+    "language": "English",
+    "tier": 2,
+    "prompt": "Create customer Arctic Shipping ASA, org number 890123456, address Harbour Road 1, 4014 Stavanger, email accounts@arcticshipping.no. Issue an invoice for NOK 200,000 including VAT (25%) and send it.",
+    "expected_entities": "Customer created, Invoice: amountInclVat=200000, vatRate=25%, amountExclVat=160000, invoice sent"
+  },
+  {
+    "id": 28,
+    "category": "Invoicing",
+    "language": "English",
+    "tier": 3,
+    "prompt": "Register customer TechBridge AS (org number 801234567, Digitalveien 99, 0484 Oslo, email finance@techbridge.no). Create and send an invoice for NOK 75,000 excluding VAT at 25%. Then register a full payment of the total amount.",
+    "expected_entities": "Customer created, Invoice: amountExclVat=75000, amountInclVat=93750, invoice sent, full payment registered, outstanding=0"
+  },
+  {
+    "id": 29,
+    "category": "Invoicing",
+    "language": "Norwegian Nynorsk",
+    "tier": 2,
+    "prompt": "Registrer kunde Sognefjorden Turisme AS (org.nr. 856712345, Fjordvegen 11, 6856 Sogndal, e-post faktura@sognefjorden.no). Opprett og send ein faktura på kr 45 000 eksklusive MVA (25 %).",
+    "expected_entities": "Customer created, Invoice: amountExclVat=45000, vatRate=25%, amountInclVat=56250, invoice sent"
+  },
+  {
+    "id": 30,
+    "category": "Invoicing",
+    "language": "Spanish",
+    "tier": 2,
+    "prompt": "Registre el cliente Escandinavia Tech SA, número de organización 834512678, dirección Vikingveien 4, 0275 Oslo, correo electrónico factura@escandinavia.es. Cree y envíe una factura por 60 000 kr sin IVA (25%).",
+    "expected_entities": "Customer created, Invoice: amountExclVat=60000, vatRate=25%, amountInclVat=75000, invoice sent"
+  },
+  {
+    "id": 31,
+    "category": "Invoicing",
+    "language": "German",
+    "tier": 2,
+    "prompt": "Registrieren Sie den Kunden Skandinavische Beratung GmbH, Organisationsnummer 867123450, Adresse Birkenweg 14, 0368 Oslo, E-Mail rechnung@skandberatung.de. Erstellen und senden Sie eine Rechnung über 90 000 kr ohne MwSt (25%).",
+    "expected_entities": "Customer created, Invoice: amountExclVat=90000, vatRate=25%, amountInclVat=112500, invoice sent"
+  },
+  {
+    "id": 32,
+    "category": "Invoicing",
+    "language": "French",
+    "tier": 2,
+    "prompt": "Enregistrez le client Services Nordiques SARL, numéro d'organisation 845671230, adresse Rue du Nord 7, 0166 Oslo, e-mail facture@servicesnord.fr. Créez et envoyez une facture de 55 000 kr HT (TVA 25%).",
+    "expected_entities": "Customer created, Invoice: amountExclVat=55000, vatRate=25%, amountInclVat=68750, invoice sent"
+  },
+  {
+    "id": 33,
+    "category": "Invoicing",
+    "language": "Portuguese",
+    "tier": 2,
+    "prompt": "Registre o cliente Soluções Nórdicas Lda, número de organização 823451670, endereço Avenida dos Fiordes 3, 0250 Oslo, e-mail fatura@solnord.pt. Crie e envie uma fatura de 42 000 kr sem IVA (25%).",
+    "expected_entities": "Customer created, Invoice: amountExclVat=42000, vatRate=25%, amountInclVat=52500, invoice sent"
+  },
+  {
+    "id": 34,
+    "category": "Invoicing",
+    "language": "Norwegian Bokmal",
+    "tier": 2,
+    "prompt": "Opprett en faktura for tjenester levert til Greenfield Energi AS (org.nr. 890567123, Solveien 8, 4021 Stavanger, e-post regnskap@greenfield.no). Beløp: kr 18 500 eksklusiv MVA med 25 % MVA-sats. Send fakturaen.",
+    "expected_entities": "Customer created, Invoice: amountExclVat=18500, vatRate=25%, amountInclVat=23125, invoice sent"
+  },
+  {
+    "id": 35,
+    "category": "Invoicing",
+    "language": "Norwegian Bokmal",
+    "tier": 1,
+    "prompt": "Opprett et produkt med produktnummer 5001, navn «Konsulenttimer», pris kr 1 200 eksklusiv MVA, MVA-sats 25 %. Opprett deretter kunde Datatjenester AS (org.nr. 812678345, Teknologiveien 5, 0590 Oslo, e-post faktura@datatjenester.no) og send en faktura for 40 timer konsulentarbeid.",
+    "expected_entities": "Product created (number=5001, price=1200, vat=25%), Customer created, Invoice: 40 x 1200 = amountExclVat=48000, amountInclVat=60000, invoice sent"
+  },
+  {
+    "id": 36,
+    "category": "Travel Expenses",
+    "language": "Norwegian Bokmal",
+    "tier": 1,
+    "prompt": "Opprett en reiseregning for ansatt Marte Olsen med tittel «Kundemøte Bergen». Turen gikk fra Oslo til Bergen, avreise 10. mars 2026, retur 11. mars 2026.",
+    "expected_entities": "Travel expense: title=Kundemøte Bergen, employee=Marte Olsen, departure=Oslo, destination=Bergen, departureDate=2026-03-10, returnDate=2026-03-11"
+  },
+  {
+    "id": 37,
+    "category": "Travel Expenses",
+    "language": "Norwegian Bokmal",
+    "tier": 2,
+    "prompt": "Opprett en reiseregning for ansatt Petter Johansen med tittel «Konferanse Stavanger». Legg til følgende kostnader: Hotell kr 2 500, taxi kr 450, og flyreise kr 3 200.",
+    "expected_entities": "Travel expense: title=Konferanse Stavanger, employee=Petter Johansen, costs=[hotel=2500, taxi=450, flight=3200], totalCosts=6150"
+  },
+  {
+    "id": 38,
+    "category": "Travel Expenses",
+    "language": "Norwegian Nynorsk",
+    "tier": 1,
+    "prompt": "Opprett ei reiserekning for tilsett Ingrid Halvorsen med tittel «Salstur Ålesund». Reisa gjekk frå Trondheim til Ålesund, avreise 5. april 2026, retur 6. april 2026.",
+    "expected_entities": "Travel expense: title=Salstur Ålesund, employee=Ingrid Halvorsen, departure=Trondheim, destination=Ålesund, departureDate=2026-04-05, returnDate=2026-04-06"
+  },
+  {
+    "id": 39,
+    "category": "Travel Expenses",
+    "language": "English",
+    "tier": 2,
+    "prompt": "Create a travel expense report for employee Thomas Eriksen titled 'Client Visit London'. Add the following costs: Hotel NOK 8,500, flight NOK 4,200, meals NOK 1,800.",
+    "expected_entities": "Travel expense: title=Client Visit London, employee=Thomas Eriksen, costs=[hotel=8500, flight=4200, meals=1800], totalCosts=14500"
+  },
+  {
+    "id": 40,
+    "category": "Travel Expenses",
+    "language": "Spanish",
+    "tier": 1,
+    "prompt": "Cree un informe de gastos de viaje para el empleado Elena García con título «Reunión Madrid». El viaje fue de Oslo a Madrid, salida el 20 de abril de 2026, regreso el 22 de abril de 2026.",
+    "expected_entities": "Travel expense: title=Reunión Madrid, employee=Elena García, departure=Oslo, destination=Madrid, departureDate=2026-04-20, returnDate=2026-04-22"
+  },
+  {
+    "id": 41,
+    "category": "Travel Expenses",
+    "language": "German",
+    "tier": 2,
+    "prompt": "Erstellen Sie einen Reisekostenbericht für Mitarbeiter Klaus Weber mit dem Titel «Messe Berlin». Fügen Sie folgende Kosten hinzu: Hotel 5 200 kr, Flug 3 800 kr, Taxi 650 kr.",
+    "expected_entities": "Travel expense: title=Messe Berlin, employee=Klaus Weber, costs=[hotel=5200, flight=3800, taxi=650], totalCosts=9650"
+  },
+  {
+    "id": 42,
+    "category": "Travel Expenses",
+    "language": "French",
+    "tier": 1,
+    "prompt": "Créez une note de frais de voyage pour l'employé Sophie Martin avec le titre «Salon Paris». Le voyage est d'Oslo à Paris, départ le 15 mai 2026, retour le 17 mai 2026.",
+    "expected_entities": "Travel expense: title=Salon Paris, employee=Sophie Martin, departure=Oslo, destination=Paris, departureDate=2026-05-15, returnDate=2026-05-17"
+  },
+  {
+    "id": 43,
+    "category": "Travel Expenses",
+    "language": "Portuguese",
+    "tier": 2,
+    "prompt": "Crie um relatório de despesas de viagem para o funcionário Pedro Santos com título «Visita Cliente Lisboa». Adicione os seguintes custos: Hotel 4 800 kr, voo 3 500 kr, refeições 1 200 kr.",
+    "expected_entities": "Travel expense: title=Visita Cliente Lisboa, employee=Pedro Santos, costs=[hotel=4800, flight=3500, meals=1200], totalCosts=9500"
+  },
+  {
+    "id": 44,
+    "category": "Travel Expenses",
+    "language": "Norwegian Bokmal",
+    "tier": 2,
+    "prompt": "Opprett en reiseregning for ansatt Henrik Dahl med tittel «Prosjektmøte Tromsø». Legg til hotell kr 3 100 og fly kr 4 600. Slett deretter hele reiseregningen.",
+    "expected_entities": "Travel expense created with costs, then deleted"
+  },
+  {
+    "id": 45,
+    "category": "Projects",
+    "language": "Norwegian Bokmal",
+    "tier": 2,
+    "prompt": "Registrer kunde Bygg & Anlegg AS (org.nr. 834567012, Anleggsveien 9, 1337 Sandvika, e-post prosjekt@byggoanlegg.no). Opprett et prosjekt med navn «Kontoroppussing 2026» knyttet til denne kunden. Prosjektleder er ansatt Tone Bakke. Startdato 1. april 2026.",
+    "expected_entities": "Customer created, Project: name=Kontoroppussing 2026, customer=Bygg & Anlegg AS, projectManager=Tone Bakke, startDate=2026-04-01"
+  },
+  {
+    "id": 46,
+    "category": "Projects",
+    "language": "English",
+    "tier": 2,
+    "prompt": "Register customer Digital Wave AS (org number 867012345, Techpark 22, 0371 Oslo, email pm@digitalwave.no). Create a project called 'Platform Migration Q2' linked to this customer. Project manager is employee Silje Andersen. Start date 15th March 2026.",
+    "expected_entities": "Customer created, Project: name=Platform Migration Q2, customer=Digital Wave AS, projectManager=Silje Andersen, startDate=2026-03-15"
+  },
+  {
+    "id": 47,
+    "category": "Projects",
+    "language": "Norwegian Nynorsk",
+    "tier": 2,
+    "prompt": "Registrer kunde Fjellbygg AS (org.nr. 845012367, Fjellvegen 6, 2609 Lillehammer, e-post post@fjellbygg.no). Opprett eit prosjekt med namn «Hytteprosjektet Sjusjøen» knytt til denne kunden. Prosjektleiar er tilsett Rune Vik. Startdato 1. juni 2026.",
+    "expected_entities": "Customer created, Project: name=Hytteprosjektet Sjusjøen, customer=Fjellbygg AS, projectManager=Rune Vik, startDate=2026-06-01"
+  },
+  {
+    "id": 48,
+    "category": "Projects",
+    "language": "Spanish",
+    "tier": 2,
+    "prompt": "Registre el cliente Consultoría Norte SA (número de organización 812067345, Avenida Principal 18, 0250 Oslo, correo proyecto@consultorianorte.es). Cree un proyecto llamado «Auditoría Fiscal 2026» vinculado a este cliente. El jefe de proyecto es el empleado María López. Fecha de inicio: 1 de mayo de 2026.",
+    "expected_entities": "Customer created, Project: name=Auditoría Fiscal 2026, customer=Consultoría Norte SA, projectManager=María López, startDate=2026-05-01"
+  },
+  {
+    "id": 49,
+    "category": "Departments",
+    "language": "Norwegian Bokmal",
+    "tier": 1,
+    "prompt": "Opprett en avdeling med navn «Salg» og avdelingsnummer 100.",
+    "expected_entities": "Department: name=Salg, number=100"
+  },
+  {
+    "id": 50,
+    "category": "Departments",
+    "language": "Norwegian Bokmal",
+    "tier": 1,
+    "prompt": "Opprett tre avdelinger: «Økonomi» (nr. 200), «IT» (nr. 300), og «HR» (nr. 400).",
+    "expected_entities": "Departments: [Økonomi/200, IT/300, HR/400]"
+  },
+  {
+    "id": 51,
+    "category": "Departments",
+    "language": "Norwegian Nynorsk",
+    "tier": 1,
+    "prompt": "Opprett to avdelingar: «Marknadsføring» (nr. 150) og «Logistikk» (nr. 160).",
+    "expected_entities": "Departments: [Marknadsføring/150, Logistikk/160]"
+  },
+  {
+    "id": 52,
+    "category": "Departments",
+    "language": "English",
+    "tier": 1,
+    "prompt": "Create a department named 'Research & Development' with department number 500.",
+    "expected_entities": "Department: name=Research & Development, number=500"
+  },
+  {
+    "id": 53,
+    "category": "Departments",
+    "language": "German",
+    "tier": 1,
+    "prompt": "Erstellen Sie drei Abteilungen: «Vertrieb» (Nr. 110), «Produktion» (Nr. 120) und «Qualitätssicherung» (Nr. 130).",
+    "expected_entities": "Departments: [Vertrieb/110, Produktion/120, Qualitätssicherung/130]"
+  },
+  {
+    "id": 54,
+    "category": "Departments",
+    "language": "French",
+    "tier": 1,
+    "prompt": "Créez un département nommé «Comptabilité» avec le numéro de département 250.",
+    "expected_entities": "Department: name=Comptabilité, number=250"
+  },
+  {
+    "id": 55,
+    "category": "Departments",
+    "language": "Spanish",
+    "tier": 1,
+    "prompt": "Cree dos departamentos: «Ventas» (número 310) y «Soporte Técnico» (número 320).",
+    "expected_entities": "Departments: [Ventas/310, Soporte Técnico/320]"
+  },
+  {
+    "id": 56,
+    "category": "Departments",
+    "language": "Portuguese",
+    "tier": 1,
+    "prompt": "Crie um departamento chamado «Recursos Humanos» com o número de departamento 450.",
+    "expected_entities": "Department: name=Recursos Humanos, number=450"
+  },
+  {
+    "id": 57,
+    "category": "Corrections",
+    "language": "Norwegian Bokmal",
+    "tier": 2,
+    "prompt": "Opprett kunde Feil Firma AS (org.nr. 890012345, Feilgata 1, 0100 Oslo, e-post feil@firma.no). Opprett og send en faktura på kr 30 000 eksklusiv MVA (25 %). Lag deretter en kreditnota som kansellerer hele fakturaen.",
+    "expected_entities": "Customer created, Invoice created and sent (amountExclVat=30000, amountInclVat=37500), Credit note created cancelling full invoice"
+  },
+  {
+    "id": 58,
+    "category": "Corrections",
+    "language": "English",
+    "tier": 2,
+    "prompt": "Register customer Wrongly Billed Ltd (org number 878012345, Error Lane 5, 0200 Oslo, email fix@wronglybilled.com). Create and send an invoice for NOK 15,000 excluding VAT at 25%. Then create a credit note for the full invoice amount.",
+    "expected_entities": "Customer created, Invoice created and sent (amountExclVat=15000, amountInclVat=18750), Credit note created for full amount"
+  },
+  {
+    "id": 59,
+    "category": "Corrections",
+    "language": "Norwegian Bokmal",
+    "tier": 2,
+    "prompt": "Opprett en reiseregning for ansatt Lars Holm med tittel «Feilregistrert reise». Slett deretter denne reiseregningen.",
+    "expected_entities": "Travel expense created (title=Feilregistrert reise, employee=Lars Holm), then deleted"
+  },
+  {
+    "id": 60,
+    "category": "Corrections",
+    "language": "Norwegian Nynorsk",
+    "tier": 2,
+    "prompt": "Registrer kunde Testselskap AS (org.nr. 801234560, Testgata 1, 0100 Oslo, e-post test@testselskap.no). Opprett og send ein faktura på kr 22 000 eksklusive MVA (25 %). Opprett så ein kreditnota for heile fakturaen.",
+    "expected_entities": "Customer created, Invoice created and sent (amountExclVat=22000, amountInclVat=27500), Credit note for full amount"
+  },
+  {
+    "id": 61,
+    "category": "Invoicing",
+    "language": "Norwegian Bokmal",
+    "tier": 2,
+    "prompt": "Opprett et produkt med produktnummer 7001, navn «Webdesign-pakke», pris kr 35 000 eksklusiv MVA, MVA 25 %. Registrer kunde Nettside AS (org.nr. 890345612, Webveien 4, 0580 Oslo, e-post nettside@as.no). Send en faktura for 1 stk Webdesign-pakke.",
+    "expected_entities": "Product created (7001, 35000, 25%), Customer created, Invoice: amountExclVat=35000, amountInclVat=43750, invoice sent"
+  },
+  {
+    "id": 62,
+    "category": "Customers & Products",
+    "language": "Norwegian Bokmal",
+    "tier": 1,
+    "prompt": "Opprett et produkt med produktnummer 9999, navn «Gratis rådgivning», pris kr 0, MVA-fritatt.",
+    "expected_entities": "Product: productNumber=9999, name=Gratis rådgivning, price=0, vatExempt=true"
+  },
+  {
+    "id": 63,
+    "category": "Customers & Products",
+    "language": "English",
+    "tier": 1,
+    "prompt": "Create a product with product number 4020, name 'Annual Support License', price NOK 24,000 excluding VAT, VAT rate 25%. Also create a product with number 4021, name 'Installation Service', price NOK 5,000 excluding VAT, VAT rate 25%.",
+    "expected_entities": "Products: [4020/Annual Support License/24000/25%, 4021/Installation Service/5000/25%]"
+  },
+  {
+    "id": 64,
+    "category": "Employees",
+    "language": "English",
+    "tier": 1,
+    "prompt": "Create employee Aisha Patel, email aisha.patel@company.com, date of birth 17th August 1995, start date 1st June 2026. Make her an account administrator.",
+    "expected_entities": "Employee: name=Aisha Patel, email=aisha.patel@company.com, dateOfBirth=1995-08-17, startDate=2026-06-01, isAdmin=true"
+  },
+  {
+    "id": 65,
+    "category": "Employees",
+    "language": "French",
+    "tier": 1,
+    "prompt": "Créez deux employés : (1) Pierre Laurent, e-mail pierre.laurent@bureau.fr, date de naissance 10 février 1986, date de début 1er avril 2026 ; (2) Camille Moreau, e-mail camille.moreau@bureau.fr, date de naissance 5 août 1990, date de début 1er avril 2026.",
+    "expected_entities": "Employees: [Pierre Laurent (1986-02-10, 2026-04-01), Camille Moreau (1990-08-05, 2026-04-01)]"
+  },
+  {
+    "id": 66,
+    "category": "Invoicing",
+    "language": "Norwegian Bokmal",
+    "tier": 2,
+    "prompt": "Registrer kunde Helse Vest AS (org.nr. 867345012, Sykehusveien 1, 5021 Bergen, e-post okonomi@helsevest.no). Opprett og send en faktura på kr 500 000 inklusiv MVA (25 %).",
+    "expected_entities": "Customer created, Invoice: amountInclVat=500000, amountExclVat=400000, vatRate=25%, invoice sent"
+  },
+  {
+    "id": 67,
+    "category": "Invoicing",
+    "language": "English",
+    "tier": 2,
+    "prompt": "Register customer EcoTech Solutions AS (org number 845123067, Green Road 12, 0580 Oslo, email billing@ecotech.no). Create and send a VAT-exempt invoice for NOK 28,000.",
+    "expected_entities": "Customer created, Invoice: amount=28000, vatExempt=true, no VAT applied, invoice sent"
+  },
+  {
+    "id": 68,
+    "category": "Invoicing",
+    "language": "German",
+    "tier": 3,
+    "prompt": "Registrieren Sie den Kunden Alpen Handel GmbH (Organisationsnummer 823067145, Bergstraße 3, 0370 Oslo, E-Mail buchhaltung@alpenhandel.de). Erstellen und senden Sie eine Rechnung über 180 000 kr ohne MwSt (25%). Registrieren Sie dann eine Teilzahlung von 100 000 kr.",
+    "expected_entities": "Customer created, Invoice: amountExclVat=180000, amountInclVat=225000, invoice sent, partial payment=100000, outstanding=125000"
+  },
+  {
+    "id": 69,
+    "category": "Invoicing",
+    "language": "French",
+    "tier": 3,
+    "prompt": "Enregistrez le client Conseil Maritime SARL (numéro d'organisation 890671230, Port de Commerce 5, 0195 Oslo, e-mail finance@conseilmaritime.fr). Créez et envoyez une facture de 95 000 kr HT (TVA 25%). Enregistrez ensuite le paiement intégral.",
+    "expected_entities": "Customer created, Invoice: amountExclVat=95000, amountInclVat=118750, invoice sent, full payment registered, outstanding=0"
+  },
+  {
+    "id": 70,
+    "category": "Invoicing",
+    "language": "Spanish",
+    "tier": 3,
+    "prompt": "Registre el cliente Servicios Digitales SA (número de organización 812345067, Calle Digital 8, 0280 Oslo, correo facturacion@servdigitales.es). Cree y envíe una factura por 140 000 kr sin IVA (25%). Registre un pago parcial de 50 000 kr.",
+    "expected_entities": "Customer created, Invoice: amountExclVat=140000, amountInclVat=175000, invoice sent, partial payment=50000, outstanding=125000"
+  },
+  {
+    "id": 71,
+    "category": "Invoicing",
+    "language": "Portuguese",
+    "tier": 3,
+    "prompt": "Registre o cliente Inovação Global Lda (número de organização 867012340, Rua da Inovação 15, 0300 Oslo, e-mail contabilidade@inovglobal.pt). Crie e envie uma fatura de 65 000 kr sem IVA (25%). Crie depois uma nota de crédito para o valor total da fatura.",
+    "expected_entities": "Customer created, Invoice: amountExclVat=65000, amountInclVat=81250, invoice sent, credit note created for full amount"
+  },
+  {
+    "id": 72,
+    "category": "Projects",
+    "language": "German",
+    "tier": 2,
+    "prompt": "Registrieren Sie den Kunden Baumeister AG (Organisationsnummer 856701234, Bahnhofstraße 10, 0155 Oslo, E-Mail projekt@baumeister.de). Erstellen Sie ein Projekt mit dem Namen «Bürorenovierung Oslo» verknüpft mit diesem Kunden. Projektleiter ist Mitarbeiter Erik Larsen. Startdatum: 1. Mai 2026.",
+    "expected_entities": "Customer created, Project: name=Bürorenovierung Oslo, customer=Baumeister AG, projectManager=Erik Larsen, startDate=2026-05-01"
+  },
+  {
+    "id": 73,
+    "category": "Projects",
+    "language": "French",
+    "tier": 2,
+    "prompt": "Enregistrez le client Architecture Scandinave SARL (numéro d'organisation 834012567, Boulevard Haussmann 25, 0190 Oslo, e-mail projet@archiscandinave.fr). Créez un projet nommé «Rénovation Siège Social» lié à ce client. Chef de projet : employé Anne Svendsen. Date de début : 15 avril 2026.",
+    "expected_entities": "Customer created, Project: name=Rénovation Siège Social, customer=Architecture Scandinave SARL, projectManager=Anne Svendsen, startDate=2026-04-15"
+  },
+  {
+    "id": 74,
+    "category": "Projects",
+    "language": "Portuguese",
+    "tier": 2,
+    "prompt": "Registre o cliente Engenharia Atlântica Lda (número de organização 812340567, Avenida Atlântica 9, 0260 Oslo, e-mail projeto@engatlant.pt). Crie um projeto chamado «Migração de Dados 2026» vinculado a este cliente. Gerente de projeto: funcionário Jon Berge. Data de início: 1 de junho de 2026.",
+    "expected_entities": "Customer created, Project: name=Migração de Dados 2026, customer=Engenharia Atlântica Lda, projectManager=Jon Berge, startDate=2026-06-01"
+  },
+  {
+    "id": 75,
+    "category": "Employees",
+    "language": "Norwegian Bokmal",
+    "tier": 1,
+    "prompt": "Opprett to ansatte: (1) Sara Kristiansen, e-post sara.k@firma.no, født 28. desember 1993, startdato 1. mars 2026; (2) Anders Lie, e-post anders.lie@firma.no, født 9. april 1988, startdato 1. mars 2026.",
+    "expected_entities": "Employees: [Sara Kristiansen (1993-12-28, 2026-03-01), Anders Lie (1988-04-09, 2026-03-01)]"
+  },
+  {
+    "id": 76,
+    "category": "Customers & Products",
+    "language": "Norwegian Bokmal",
+    "tier": 1,
+    "prompt": "Registrer både kunde og leverandør for selskapet Duo Partner AS, organisasjonsnummer 890456123, adresse Dobbelgata 2, 0175 Oslo, e-post post@duopartner.no, telefon 22445566.",
+    "expected_entities": "Company: name=Duo Partner AS, orgNumber=890456123, isCustomer=true, isSupplier=true, address/email/phone set"
+  },
+  {
+    "id": 77,
+    "category": "Customers & Products",
+    "language": "Norwegian Bokmal",
+    "tier": 1,
+    "prompt": "Opprett tre produkter: (1) «Tastatur USB» nr. 6001, pris kr 399 ekskl. MVA, 25 % MVA; (2) «Skjerm 24\"» nr. 6002, pris kr 3 499 ekskl. MVA, 25 % MVA; (3) «Headset Pro» nr. 6003, pris kr 1 299 ekskl. MVA, 25 % MVA.",
+    "expected_entities": "Products: [6001/Tastatur USB/399/25%, 6002/Skjerm 24\"/3499/25%, 6003/Headset Pro/1299/25%]"
+  },
+  {
+    "id": 78,
+    "category": "Invoicing",
+    "language": "Norwegian Bokmal",
+    "tier": 2,
+    "prompt": "Opprett kunde Småbedrift Hansen (org.nr. 801230456, Lillegata 1, 3015 Drammen, e-post faktura@smaabedrift.no). Lag og send en faktura på kr 1 000 eksklusiv MVA (25 %).",
+    "expected_entities": "Customer created, Invoice: amountExclVat=1000, amountInclVat=1250, invoice sent"
+  },
+  {
+    "id": 79,
+    "category": "Invoicing",
+    "language": "Norwegian Bokmal",
+    "tier": 3,
+    "prompt": "Opprett kunde Storkonsern ASA (org.nr. 890567012, Konsernveien 100, 0250 Oslo, e-post regnskap@storkonsern.no). Lag og send en faktura på kr 450 000 eksklusiv MVA (25 %). Registrer full betaling av hele fakturabeløpet inklusiv MVA.",
+    "expected_entities": "Customer created, Invoice: amountExclVat=450000, amountInclVat=562500, invoice sent, full payment=562500 registered, outstanding=0"
+  },
+  {
+    "id": 80,
+    "category": "Travel Expenses",
+    "language": "Norwegian Bokmal",
+    "tier": 2,
+    "prompt": "Opprett ansatt Maria Sanchez med e-post maria.sanchez@firma.no, fødselsdato 1. juni 1992, startdato 1. januar 2026. Opprett deretter en reiseregning for Maria med tittel «Opplæring Stockholm». Legg til flyreise kr 2 800 og hotell kr 4 200.",
+    "expected_entities": "Employee created (Maria Sanchez), Travel expense: title=Opplæring Stockholm, employee=Maria Sanchez, costs=[flight=2800, hotel=4200], totalCosts=7000"
+  },
+  {
+    "id": 81,
+    "category": "Employees",
+    "language": "Spanish",
+    "tier": 1,
+    "prompt": "Cree un nuevo empleado llamado Alejandro Ruiz, correo electrónico alejandro.ruiz@nordica.es, fecha de nacimiento 30 de diciembre de 1994, fecha de inicio 15 de abril de 2026. Hágalo administrador de la cuenta.",
+    "expected_entities": "Employee: name=Alejandro Ruiz, email=alejandro.ruiz@nordica.es, dateOfBirth=1994-12-30, startDate=2026-04-15, isAdmin=true"
+  },
+  {
+    "id": 82,
+    "category": "Employees",
+    "language": "Portuguese",
+    "tier": 1,
+    "prompt": "Crie dois funcionários: (1) João Silva, e-mail joao.silva@empresa.pt, data de nascimento 15 de janeiro de 1990, data de início 1 de março de 2026; (2) Beatriz Costa, e-mail beatriz.costa@empresa.pt, data de nascimento 22 de julho de 1993, data de início 1 de março de 2026.",
+    "expected_entities": "Employees: [João Silva (1990-01-15, 2026-03-01), Beatriz Costa (1993-07-22, 2026-03-01)]"
+  },
+  {
+    "id": 83,
+    "category": "Employees",
+    "language": "German",
+    "tier": 1,
+    "prompt": "Aktualisieren Sie die Kontaktinformationen des Mitarbeiters Anna Schneider: Telefonnummer 91234567, Adresse Lindenstraße 42, 0350 Oslo.",
+    "expected_entities": "Employee update: name=Anna Schneider, phone=91234567, address=Lindenstraße 42, postalCode=0350, city=Oslo"
+  },
+  {
+    "id": 84,
+    "category": "Customers & Products",
+    "language": "French",
+    "tier": 1,
+    "prompt": "Enregistrez un client nommé Innovations Boréales SA, numéro d'organisation 867890120, adresse 8 Quai des Neiges, 0170 Oslo, e-mail contact@innoboreales.fr, téléphone +47 21345678.",
+    "expected_entities": "Customer: name=Innovations Boréales SA, orgNumber=867890120, address=8 Quai des Neiges, postalCode=0170, city=Oslo, email=contact@innoboreales.fr, phone=+47 21345678, isCustomer=true"
+  },
+  {
+    "id": 85,
+    "category": "Customers & Products",
+    "language": "Spanish",
+    "tier": 1,
+    "prompt": "Cree un producto con número de producto 8010, nombre «Licencia Software Anual», precio 18 000 kr con IVA incluido (25%).",
+    "expected_entities": "Product: productNumber=8010, name=Licencia Software Anual, priceInclVat=18000, vatRate=25% (priceExclVat=14400)"
+  },
+  {
+    "id": 86,
+    "category": "Customers & Products",
+    "language": "German",
+    "tier": 1,
+    "prompt": "Erstellen Sie ein Produkt mit Produktnummer 8020, Name «Serverrack 42U», Preis 28 500 kr ohne MwSt, MwSt-Satz 25%.",
+    "expected_entities": "Product: productNumber=8020, name=Serverrack 42U, priceExclVat=28500, vatRate=25%"
+  },
+  {
+    "id": 87,
+    "category": "Departments",
+    "language": "Norwegian Bokmal",
+    "tier": 1,
+    "prompt": "Opprett fire avdelinger: «Drift» (nr. 600), «Utvikling» (nr. 610), «Design» (nr. 620) og «Kundeservice» (nr. 630).",
+    "expected_entities": "Departments: [Drift/600, Utvikling/610, Design/620, Kundeservice/630]"
+  },
+  {
+    "id": 88,
+    "category": "Departments",
+    "language": "English",
+    "tier": 1,
+    "prompt": "Create two departments: 'Finance' with department number 700 and 'Legal' with department number 710.",
+    "expected_entities": "Departments: [Finance/700, Legal/710]"
+  },
+  {
+    "id": 89,
+    "category": "Invoicing",
+    "language": "Norwegian Nynorsk",
+    "tier": 3,
+    "prompt": "Registrer kunde Hardanger Frukt AS (org.nr. 812345670, Fruktgarden 3, 5783 Eidfjord, e-post rekning@hardangerfrukt.no). Opprett og send ein faktura på kr 38 000 eksklusive MVA (25 %). Registrer så full betaling.",
+    "expected_entities": "Customer created, Invoice: amountExclVat=38000, amountInclVat=47500, invoice sent, full payment registered, outstanding=0"
+  },
+  {
+    "id": 90,
+    "category": "Corrections",
+    "language": "German",
+    "tier": 2,
+    "prompt": "Registrieren Sie den Kunden Fehler AG (Organisationsnummer 801234056, Irrweg 1, 0100 Oslo, E-Mail fehler@ag.de). Erstellen und senden Sie eine Rechnung über 45 000 kr ohne MwSt (25%). Erstellen Sie dann eine Gutschrift über den gesamten Rechnungsbetrag.",
+    "expected_entities": "Customer created, Invoice: amountExclVat=45000, amountInclVat=56250, invoice sent, credit note for full amount"
+  },
+  {
+    "id": 91,
+    "category": "Corrections",
+    "language": "French",
+    "tier": 2,
+    "prompt": "Enregistrez le client Erreur & Fils SARL (numéro d'organisation 878123045, Rue de l'Erreur 3, 0110 Oslo, e-mail erreur@fils.fr). Créez et envoyez une facture de 28 000 kr HT (TVA 25%). Créez ensuite un avoir pour l'intégralité de la facture.",
+    "expected_entities": "Customer created, Invoice: amountExclVat=28000, amountInclVat=35000, invoice sent, credit note for full amount"
+  },
+  {
+    "id": 92,
+    "category": "Corrections",
+    "language": "Spanish",
+    "tier": 2,
+    "prompt": "Cree un informe de gastos de viaje para el empleado Roberto Vega con título «Viaje Cancelado». Luego elimine el informe de gastos.",
+    "expected_entities": "Travel expense created (title=Viaje Cancelado, employee=Roberto Vega), then deleted"
+  },
+  {
+    "id": 93,
+    "category": "Corrections",
+    "language": "Portuguese",
+    "tier": 2,
+    "prompt": "Registre o cliente Empresa Errada Lda (número de organização 845670123, Rua do Engano 7, 0130 Oslo, e-mail erro@empresaerrada.pt). Crie e envie uma fatura de 33 000 kr sem IVA (25%). Depois crie uma nota de crédito para o valor total.",
+    "expected_entities": "Customer created, Invoice: amountExclVat=33000, amountInclVat=41250, invoice sent, credit note for full amount"
+  },
+  {
+    "id": 94,
+    "category": "Travel Expenses",
+    "language": "Norwegian Nynorsk",
+    "tier": 2,
+    "prompt": "Opprett ei reiserekning for tilsett Astrid Kvam med tittel «Leverandørbesøk Haugesund». Legg til hotell kr 1 900, taxi kr 350, og middag kr 780.",
+    "expected_entities": "Travel expense: title=Leverandørbesøk Haugesund, employee=Astrid Kvam, costs=[hotel=1900, taxi=350, dinner=780], totalCosts=3030"
+  },
+  {
+    "id": 95,
+    "category": "Projects",
+    "language": "Norwegian Bokmal",
+    "tier": 2,
+    "prompt": "Opprett avdeling «Konsulenter» (nr. 800). Registrer kunde Rådgiverhuset AS (org.nr. 823456701, Konsulentveien 15, 0486 Oslo, e-post prosjekt@raadgiverhuset.no). Opprett prosjekt «ERP-implementering» knyttet til Rådgiverhuset AS, prosjektleder er ansatt Gunnar Skog, startdato 1. mai 2026.",
+    "expected_entities": "Department created (Konsulenter/800), Customer created, Project: name=ERP-implementering, customer=Rådgiverhuset AS, projectManager=Gunnar Skog, startDate=2026-05-01"
+  },
+  {
+    "id": 96,
+    "category": "Invoicing",
+    "language": "English",
+    "tier": 2,
+    "prompt": "Create product number 9001 named 'Cloud Hosting Monthly' at NOK 2,500 excluding VAT (25%). Register customer SkyNet Services AS (org number 856701230, Cloud Avenue 7, 0505 Oslo, email accounts@skynetservices.no). Send an invoice for 12 months of Cloud Hosting Monthly.",
+    "expected_entities": "Product created (9001, 2500, 25%), Customer created, Invoice: 12 x 2500 = amountExclVat=30000, amountInclVat=37500, invoice sent"
+  },
+  {
+    "id": 97,
+    "category": "Customers & Products",
+    "language": "Norwegian Nynorsk",
+    "tier": 1,
+    "prompt": "Registrer ein leverandør med namn Nordfjord Utstyr AS, organisasjonsnummer 834501267, adresse Utstyrsvegen 8, 6770 Nordfjordeid, e-post ordre@nordfjordutstyr.no, telefon 57889900.",
+    "expected_entities": "Supplier: name=Nordfjord Utstyr AS, orgNumber=834501267, address=Utstyrsvegen 8, postalCode=6770, city=Nordfjordeid, email=ordre@nordfjordutstyr.no, phone=57889900, isSupplier=true"
+  },
+  {
+    "id": 98,
+    "category": "Invoicing",
+    "language": "Norwegian Bokmal",
+    "tier": 3,
+    "prompt": "Registrer kunde Kystbyen Hotell AS (org.nr. 867012345, Havnepromenaden 22, 4610 Kristiansand, e-post regnskap@kystbyen.no). Opprett og send en faktura på kr 275 000 inklusiv MVA (25 %). Registrer en delbetaling på kr 100 000.",
+    "expected_entities": "Customer created, Invoice: amountInclVat=275000, amountExclVat=220000, invoice sent, partial payment=100000, outstanding=175000"
+  },
+  {
+    "id": 99,
+    "category": "Employees",
+    "language": "Norwegian Bokmal",
+    "tier": 1,
+    "prompt": "Opprett ansatt Li Wei med e-post li.wei@skandinord.no, fødselsdato 18. november 1996, startdato 15. mai 2026.",
+    "expected_entities": "Employee: name=Li Wei, email=li.wei@skandinord.no, dateOfBirth=1996-11-18, startDate=2026-05-15"
+  },
+  {
+    "id": 100,
+    "category": "Invoicing",
+    "language": "Norwegian Bokmal",
+    "tier": 2,
+    "prompt": "Opprett avdeling «Fakturering» (nr. 900). Registrer kunde Helsenord AS (org.nr. 845670120, Sykehusallé 5, 9019 Tromsø, e-post faktura@helsenord.no). Opprett et produkt med produktnummer 1100, navn «Helsekonsultasjon», pris kr 2 800 ekskl. MVA, 25 % MVA. Send en faktura for 10 konsultasjoner til Helsenord AS.",
+    "expected_entities": "Department created (Fakturering/900), Customer created, Product created (1100, 2800, 25%), Invoice: 10 x 2800 = amountExclVat=28000, amountInclVat=35000, invoice sent"
+  }
+]
