@@ -1,72 +1,107 @@
 [
   {
-    "id": 24,
+    "id": 39,
     "status": "OK",
-    "time": 46.3,
-    "category": "Invoicing",
-    "tier": 3
+    "time": 115.9,
+    "category": "Travel Expenses",
+    "tier": 2
   },
   {
-    "id": 25,
+    "id": 40,
     "status": "OK",
-    "time": 41.6,
-    "category": "Invoicing",
-    "tier": 3
+    "time": 57.2,
+    "category": "Travel Expenses",
+    "tier": 1
   },
   {
-    "id": 28,
+    "id": 41,
     "status": "OK",
-    "time": 42.0,
-    "category": "Invoicing",
-    "tier": 3
+    "time": 79.1,
+    "category": "Travel Expenses",
+    "tier": 2
   },
   {
-    "id": 68,
-    "status": "OK",
-    "time": 48.5,
-    "category": "Invoicing",
-    "tier": 3
-  },
-  {
-    "id": 69,
-    "status": "OK",
-    "time": 45.3,
-    "category": "Invoicing",
-    "tier": 3
-  },
-  {
-    "id": 70,
+    "id": 42,
     "status": "OK",
     "time": 46.5,
-    "category": "Invoicing",
-    "tier": 3
+    "category": "Travel Expenses",
+    "tier": 1
   },
   {
-    "id": 71,
+    "id": 43,
     "status": "OK",
-    "time": 39.5,
-    "category": "Invoicing",
-    "tier": 3
+    "time": 124.3,
+    "category": "Travel Expenses",
+    "tier": 2
   },
   {
-    "id": 79,
+    "id": 49,
     "status": "OK",
-    "time": 35.6,
-    "category": "Invoicing",
-    "tier": 3
+    "time": 14.3,
+    "category": "Departments",
+    "tier": 1
   },
   {
-    "id": 89,
+    "id": 50,
     "status": "OK",
-    "time": 37.7,
-    "category": "Invoicing",
-    "tier": 3
+    "time": 15.0,
+    "category": "Departments",
+    "tier": 1
   },
   {
-    "id": 98,
+    "id": 51,
     "status": "OK",
-    "time": 40.3,
+    "time": 16.7,
+    "category": "Departments",
+    "tier": 1
+  },
+  {
+    "id": 52,
+    "status": "OK",
+    "time": 13.7,
+    "category": "Departments",
+    "tier": 1
+  },
+  {
+    "id": 53,
+    "status": "OK",
+    "time": 17.8,
+    "category": "Departments",
+    "tier": 1
+  },
+  {
+    "id": 54,
+    "status": "OK",
+    "time": 15.7,
+    "category": "Departments",
+    "tier": 1
+  },
+  {
+    "id": 55,
+    "status": "OK",
+    "time": 16.4,
+    "category": "Departments",
+    "tier": 1
+  },
+  {
+    "id": 56,
+    "status": "OK",
+    "time": 14.6,
+    "category": "Departments",
+    "tier": 1
+  },
+  {
+    "id": 61,
+    "status": "OK",
+    "time": 38.0,
     "category": "Invoicing",
-    "tier": 3
+    "tier": 2
+  },
+  {
+    "id": 62,
+    "status": "OK",
+    "time": 18.5,
+    "category": "Customers & Products",
+    "tier": 1
   }
 ]

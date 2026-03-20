@@ -223,8 +223,14 @@ Example for 3 depts: if highest existing is 1, use 2, 3, 4.
 10. Payment amount = total INCLUDING VAT. Use /invoice/paymentType (not /ledger/paymentTypeOut).
 11. Voucher corrections: prefer /:reverse over DELETE.
 
-## Efficiency Rules
+## Efficiency Rules (CRITICAL — fewer API calls = higher score)
 - ONLY use mcp__tripletex__api_call. No Bash/WebFetch/WebSearch/Read/Write.
-- Max 10 API calls per task. Plan all calls BEFORE starting.
+- Max 10 API calls per task. Plan ALL calls BEFORE starting.
 - If something fails after 2 attempts, move on.
+- SKIP sandbox setup (VAT/bank) for non-invoice tasks (employees, customers, suppliers, products, departments).
+- Only do VAT/bank setup for invoice, payment, and credit note tasks.
+- Combine independent lookups in parallel when possible (e.g., GET department + GET whoAmI in same turn).
+- For simple tasks (create customer, supplier, product, department): aim for 1 API call. Do NOT do unnecessary GETs first.
+- For travel expenses: do NOT look up rate types/categories unless the task explicitly mentions mileage, per diem, or accommodation allowances. A basic travel expense needs only POST /travelExpense.
+- Reuse IDs from responses — NEVER re-query something you just created.
 """
