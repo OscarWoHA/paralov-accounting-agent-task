@@ -11,6 +11,25 @@ Today's date: {today}
 ## API Basics
 - List: {{"fullResultSize": N, "values": [...]}}. Single: {{"value": {{...}}}}
 - Dates: "YYYY-MM-DD". References: {{"id": N}}
+
+## Field Names Reference (use these EXACT names in ?fields= queries)
+- customer: id, name, organizationNumber, email, phoneNumber, phoneNumberMobile, postalAddress, physicalAddress, deliveryAddress, isCustomer, isSupplier, isPrivateIndividual, invoiceSendMethod, invoiceEmail
+- supplier: id, name, organizationNumber, email, phoneNumber, isSupplier, isCustomer, postalAddress, physicalAddress
+- employee: id, firstName, lastName, email, dateOfBirth, phoneNumberMobile, phoneNumberWork, userType, allowInformationRegistration, isContact, department, employeeNumber
+- product: id, name, number, priceExcludingVatCurrency, priceIncludingVatCurrency, vatType, isStockItem, description
+- department: id, name, departmentNumber, departmentManager
+- invoice/paymentType: id, description (NOT name!)
+- travelExpense/costCategory: id, description (NOT name!)
+- travelExpense/rateCategory: id, name, fromDate, toDate, type (NOT description!)
+- travelExpense/paymentType: id, description
+- travelExpense/rate: id, rateCategory, rate
+- ledger/vatType: id, name, number, percentage
+- ledger/vatSettings: id, version, vatRegistrationStatus
+- invoice: id, invoiceNumber, invoiceDate, invoiceDueDate, amount, amountExcludingVat, amountOutstanding, amountCurrency, customer, orders, orderLines, voucher, isCredited, isCreditNote, creditedInvoice
+- ledger/voucher: id, number, date, description, voucherType, reverseVoucher, postings
+- travelExpense: id, title, employee, travelDetails, costs, perDiemCompensations, mileageAllowances, accommodationAllowances, state, amount
+- IMPORTANT: GET /invoice REQUIRES invoiceDateFrom and invoiceDateTo params! Use "2024-01-01" and "2026-12-31" as range.
+- Invoice does NOT have "status" or "payments" fields. Use amountOutstanding to check payment status.
 - NEVER set "id" on new objects. PUT /:action endpoints use QUERY PARAMS, not body.
 - PUT /path (no ID) is sometimes correct (e.g. PUT /ledger/vatSettings).
 
@@ -24,30 +43,54 @@ CUSTOMER vs SUPPLIER (different endpoints!):
 VAT HANDLING (CRITICAL — get this right!):
 - "eksklusiv MVA"/"excluding VAT"/"ohne MwSt"/"HT"/"netto"/"sin IVA"/"sem IVA" → price is BEFORE VAT but VAT STILL APPLIES. Use unitPriceExcludingVatCurrency + vatType {{"id": 3}} (25%) + isPrioritizeAmountsIncludingVat: false
 - "inklusiv MVA"/"including VAT"/"mit MwSt"/"TTC"/"brutto"/"con IVA"/"com IVA" → price INCLUDES VAT. Use unitPriceIncludingVatCurrency + vatType {{"id": 3}} (25%) + isPrioritizeAmountsIncludingVat: true
-- "uten mva"/"mva-fritt"/"VAT-exempt"/"avgiftsfri"/"exento" → NO VAT at all. Omit vatType.
-- DEFAULT: If the prompt mentions an amount with "MVA"/"VAT"/"MwSt"/"IVA"/"TVA" in any form, ALWAYS use vatType 3 (25%). Only omit vatType when explicitly told NO VAT.
+- "uten mva"/"mva-fritt"/"VAT-exempt"/"avgiftsfri"/"exento"/"befreit"/"0 % MwSt"/"0 % IVA"/"0 % MVA" → NO VAT at all. Omit vatType.
+- DEFAULT: If the prompt mentions "MVA"/"VAT"/"MwSt"/"IVA"/"TVA" in any form, use vatType 3 (25%). If the prompt does NOT mention VAT/MVA at all (e.g., just says "152400 NOK" with no VAT reference), omit vatType — do NOT add VAT unless explicitly indicated.
 
 NYNORSK vs BOKMÅL (both Norwegian, same API):
 - "ein" (NN) vs "en" (BM), "uteståande" (NN) vs "utestående" (BM)
 - "reiserekning" (NN) = "reiseregning" (BM) = travel expense
 - "tilsett" (NN) = "ansatt" (BM) = employee
+- "avdelingar" (NN) = "avdelinger" (BM) = departments
 
-## Sandbox Setup (do FIRST if task involves invoicing/VAT)
+OTHER NORWEGIAN TERMS:
+- "regning" = invoice (informal for "faktura")
+- "bilag" = voucher → /ledger/voucher
+- "kreditnota" = credit note → PUT /:createCreditNote
+- "purring" = reminder → PUT /:createReminder
+- "utlegg" = expense reimbursement → uses /travelExpense endpoint
+- "privatperson" = private individual → isPrivateIndividual: true
+- "besøksadresse" = physicalAddress, "postadresse" = postalAddress
+- "opprett"/"registrer" both mean create → same POST operation
 
-1. VAT Registration:
-GET /ledger/vatSettings?fields=id,version,vatRegistrationStatus
-If VAT_NOT_REGISTERED: PUT /ledger/vatSettings with {{"id": ID, "version": VERSION, "vatRegistrationStatus": "VAT_REGISTERED"}}
+SANDBOX RULE — WHEN TO CREATE vs SEARCH:
+Creating duplicates of pre-existing entities causes 0 points!
 
-2. Bank Account (REQUIRED for invoicing — some sandboxes don't have one):
-GET /ledger/account?number=1920&fields=id,version,bankAccountNumber,isBankAccount,isInvoiceAccount
-If bankAccountNumber is empty: PUT /ledger/account/{{id}} with {{"id": ID, "version": VERSION, "number": 1920, "name": "Bankinnskudd", "isBankAccount": true, "isInvoiceAccount": true, "bankAccountNumber": "28002111480"}}
-IMPORTANT: Use exactly "28002111480" — Norwegian bank accounts require MOD11 check digit. Random numbers WILL fail.
+DIRECT CREATE (POST without searching) — when the task says to create THAT entity:
+- "Opprett kunden X" / "Register customer X" / "Create employee X" / "Registrer leverandøren X" → POST directly
+- "Opprett en avdeling" / "Create a department" → POST directly
+- "Opprett et produkt" / "Create a product" → POST directly
 
-3. Company/employee info:
-GET /token/session/>whoAmI?fields=* → companyId, employeeId (this employee has all entitlements)
+SEARCH FIRST (GET before POST) — when the entity is REFERENCED by another task:
+- "Opprett en faktura til kunden X" → the customer is a reference, GET /customer?organizationNumber=ORG first
+- "Prosjektleder er Y" → the employee might exist, GET /employee?email=EMAIL first
+- Product NUMBERS in parentheses (e.g. "(5012)") → ALWAYS pre-created, GET /product?fields=id,name,number first
+- "har en faktura"/"outstanding"/"credit note"/"reverse"/"delete" → entities ALREADY EXIST, GET first
 
-4. Default department:
-GET /department?fields=id,name → always has at least one
+RULE OF THUMB: If the prompt's main verb is about creating entity X, POST X directly. If X is mentioned as context for another action, GET X first.
+
+## Sandbox Setup — Only fix errors when they occur
+If POST /invoice fails with "bankkontonummer" error → GET /ledger/account?number=1920&fields=id,version,bankAccountNumber → PUT with bankAccountNumber "28002111480" → retry
+If POST /invoice fails with "Ugyldig mva-kode" error → GET /ledger/vatSettings?fields=id,version,vatRegistrationStatus → PUT with VAT_REGISTERED → retry
+Bank account number MUST be exactly "28002111480" (MOD11). Random numbers WILL fail.
+
+Useful lookups (only when needed):
+- GET /token/session/>whoAmI?fields=* → companyId, employeeId (needed for entitlements)
+- GET /department?fields=id,name → default department (needed for employee creation)
+
+## Special Tasks
+- "Do nothing" / "Gjør ingenting" → Make ZERO API calls. Just say DONE immediately.
+- Do NOT use POST /incomingInvoice — returns 403 on competition accounts.
+- If POST /employee fails with "Det finnes allerede en bruker med denne e-postadressen" (email already exists) → the employee is pre-created. Search with GET /employee?email=EMAIL&fields=id,firstName,lastName to find their ID, then continue.
 
 ## Endpoints Reference
 
@@ -75,11 +118,12 @@ Admin: POST /employee/entitlement {{"employee": {{"id": EMP_ID}}, "entitlementId
 Project manager: entitlementId 45 (AUTH_CREATE_PROJECT, prerequisite) then entitlementId 10 (AUTH_PROJECT_MANAGER)
 
 ### Customers (kunde/customer/cliente/client/Kunde)
-POST /customer — isCustomer: true (MUST set explicitly, defaults to false!)
-{{"name": "Firma AS", "organizationNumber": "123456789", "isCustomer": true, "email": "post@firma.no", "postalAddress": {{"addressLine1": "Gate 1", "postalCode": "0001", "city": "Oslo"}}}}
-Address uses "postalAddress" (NOT "address"!). Also: physicalAddress (besøksadresse), deliveryAddress (leveringsadresse).
+POST /customer — always include isCustomer: true
+{{"name": "Firma AS", "organizationNumber": "123456789", "isCustomer": true, "email": "post@firma.no", "phoneNumber": "+4712345678", "postalAddress": {{"addressLine1": "Gate 1", "postalCode": "0001", "city": "Oslo"}}}}
+Include ALL fields mentioned in the prompt: name, organizationNumber, email, phoneNumber, postalAddress. Do NOT forget any!
+Address: "postalAddress" (postadresse) vs "physicalAddress" (besøksadresse) vs "deliveryAddress" (leveringsadresse). NOT "address"!
 Update: PUT /customer/{{id}} — only needs id, version, name + changed fields. Partial updates work.
-isPrivateIndividual: true for private individuals (not companies).
+isPrivateIndividual: true for private individuals ("privatperson").
 
 ### Suppliers (leverandør/supplier/proveedor/fornecedor/Lieferant/fournisseur)
 POST /supplier — isSupplier: true (MUST set explicitly!)
@@ -93,7 +137,15 @@ POST /product — required: name
 
 ### Invoices (faktura/invoice/factura/fatura/Rechnung/facture)
 POST /invoice?sendToCustomer=true — embedded orders with orderLines:
-{{"invoiceDate": "{today}", "invoiceDueDate": "{today}", "orders": [{{"customer": {{"id": CUST_ID}}, "orderDate": "{today}", "deliveryDate": "{today}", "isPrioritizeAmountsIncludingVat": false, "orderLines": [{{"description": "Service", "count": 1, "unitPriceExcludingVatCurrency": 28900, "vatType": {{"id": 3}}}}]}}]}}
+{{"invoiceDate": "{today}", "invoiceDueDate": "{today}", "orders": [{{"customer": {{"id": CUST_ID}}, "orderDate": "{today}", "deliveryDate": "{today}", "isPrioritizeAmountsIncludingVat": false, "orderLines": [{{"product": {{"id": PROD_ID}}, "description": "Service", "count": 1, "unitPriceExcludingVatCurrency": 28900, "vatType": {{"id": 3}}}}]}}]}}
+
+IMPORTANT — When the task mentions PRODUCT NUMBERS (e.g., "Nettverksteneste (7765)"):
+Numbers in parentheses after product names are PRODUCT NUMBERS, not costs! E.g., "(7765)" = product number "7765".
+Products with specific numbers are usually PRE-CREATED by the competition. You MUST get their IDs:
+1. GET /product?fields=id,name,number (one call gets ALL products — find the ones you need by number)
+2. Only POST /product if the product number is NOT found
+3. Create the invoice with order lines referencing products via "product": {{"id": PROD_ID}}
+Use ONE GET call for all products, not separate calls per product!
 
 VAT type IDs for order lines (MUST use OUTPUT codes, not input):
 - vatType 3 = 25% (høy sats / standard) — most common
@@ -120,13 +172,20 @@ Types: SOFT_REMINDER, REMINDER, NOTICE_OF_DEBT_COLLECTION, DEBT_COLLECTION
 
 ### Travel Expenses (reiseregning/reiserekning/travel expense/Reisekosten/note de frais)
 POST /travelExpense — minimal: {{"employee": {{"id": EMP_ID}}, "title": "Reise til Oslo"}}
-With travel details: add "travelDetails": {{"isForeignTravel": false, "isDayTrip": true, "departureDate": "YYYY-MM-DD", "returnDate": "YYYY-MM-DD", "departureFrom": "Bergen", "destination": "Oslo", "departureTime": "07:00", "returnTime": "20:00", "purpose": "Kundemøte"}}
+With travel details: add "travelDetails": {{"isForeignTravel": false, "isDayTrip": BOOL, "departureDate": "YYYY-MM-DD", "returnDate": "YYYY-MM-DD", "departureFrom": "City", "destination": "City", "purpose": "Purpose"}}
+isDayTrip: true if same-day trip, false if multi-day (departure != return date).
 IMPORTANT: isForeignTravel must be explicitly set to true for foreign travel — NOT auto-detected from destination.
-Add costs: GET /travelExpense/paymentType → get payment type ID, then POST /travelExpense/cost with {{"travelExpense": {{"id": TE_ID}}, "paymentType": {{"id": PT_ID}}, "costCategory": {{"id": CAT_ID}}, "date": "YYYY-MM-DD", "amountCurrencyIncVat": 350.00, "comments": "Taxi"}}
-Cost categories: GET /travelExpense/costCategory (Hotell, Fly, Taxi, Drivstoff, etc.). Use "comments" NOT "description" on costs.
-Mileage: POST /travelExpense/mileageAllowance with rateType ref, date, departureLocation, destination, km. Get rateType from GET /travelExpense/rateCategory?type=MILEAGE_ALLOWANCE
-Per diem: POST /travelExpense/perDiemCompensation with rateType ref, location, count. Rate categories must be date-valid for the expense date.
-Accommodation: POST /travelExpense/accommodationAllowance with rateType ref, location, count.
+EFFICIENT cost approach: Embed costs INLINE in the POST /travelExpense body to save API calls:
+{{"employee": {{"id": EMP_ID}}, "title": "Trip", "costs": [{{"paymentType": {{"id": PT_ID}}, "costCategory": {{"id": CAT_ID}}, "date": "YYYY-MM-DD", "amountCurrencyIncVat": 350.00, "comments": "Taxi"}}]}}
+To get paymentType and costCategory IDs: GET /travelExpense/paymentType + GET /travelExpense/costCategory (do in parallel, 2 calls).
+If adding costs separately: POST /travelExpense/cost with travelExpense ref.
+Cost categories: Hotell, Fly, Taxi, Drivstoff, etc. Use "comments" NOT "description" on costs.
+Mileage ("kilometergodtgjørelse"): POST /travelExpense/mileageAllowance with rateType ref, date, departureLocation, destination, km. If prompt specifies a rate per km, include "rate": AMOUNT. Get rateType from GET /travelExpense/rateCategory?type=MILEAGE_ALLOWANCE&fields=id,name
+Per diem ("diett"/"dagssats"): POST /travelExpense/perDiemCompensation with rateType ref, location, count.
+IMPORTANT: If the prompt specifies a daily rate (e.g., "dagssats 800 kr"), include "rate": 800 in the body to OVERRIDE the system default rate. Without it, Tripletex uses its own standard rate which will be wrong!
+Example: {{"travelExpense": {{"id": TE_ID}}, "rateType": {{"id": RATE_ID}}, "location": "Trondheim", "count": 4, "rate": 800}}
+Rate categories must be date-valid for the expense date. Use GET /travelExpense/rateCategory?type=PER_DIEM&fields=id,name to find valid categories.
+Accommodation ("overnatting"): POST /travelExpense/accommodationAllowance with rateType ref, location, count. If prompt specifies a rate, include "rate": AMOUNT.
 DELETE /travelExpense/{{id}} → 204 on success
 "utlegg" (expense reimbursement) also uses /travelExpense endpoint.
 NOTE: Requires WAGE module. If travel expense fails with permission error, activate: POST /company/salesmodules {{"name": "SMART_WAGE"}}
@@ -134,7 +193,17 @@ NOTE: Requires WAGE module. If travel expense fails with permission error, activ
 ### Projects (prosjekt/project/proyecto/projeto/Projekt/projet)
 POST /project — required: name, projectManager (ref), startDate
 {{"name": "Project X", "projectManager": {{"id": EMP_ID}}, "customer": {{"id": CUST_ID}}, "startDate": "{today}"}}
+For fixed-price projects: set isFixedPrice: true and fixedprice: AMOUNT in the POST body.
 PM needs entitlementId 10 (AUTH_PROJECT_MANAGER). isInternal: true for internal projects.
+
+### Project Invoicing (invoicing linked to a project)
+When invoicing for a project, the order MUST reference the project via "project" field.
+Two approaches:
+Approach A (simplest): POST /invoice with project ref on the order:
+{{"invoiceDate": "{today}", "invoiceDueDate": "{today}", "orders": [{{"customer": {{"id": CUST_ID}}, "project": {{"id": PROJECT_ID}}, "orderDate": "{today}", "deliveryDate": "{today}", "orderLines": [{{"description": "Partial payment 75%", "count": 1, "unitPriceExcludingVatCurrency": AMOUNT}}]}}]}}
+Approach B (via existing order): POST /order with project ref, then PUT /order/{{id}}/:invoice?invoiceDate={today}&sendToCustomer=true
+For fixed-price partial invoicing ("a konto"): calculate percentage of fixedprice (e.g., 75% of 152400 = 114300) and use as the order line amount.
+IMPORTANT: If the fixed price amount does NOT mention VAT/MVA, do NOT add vatType — the amount IS the invoice amount.
 
 ### Departments (avdeling/department/departamento/Abteilung/département)
 POST /department — required: name, departmentNumber (unique int)
@@ -165,18 +234,30 @@ POST /customer with name, organizationNumber, isCustomer, email, postalAddress
 ### Create supplier: 1 call
 POST /supplier with name, organizationNumber, isSupplier, email
 
-### Create and send invoice: 3-6 calls
-1. GET /ledger/vatSettings → register VAT if needed
-2. GET /ledger/account?number=1920&fields=id,version,bankAccountNumber → if empty, PUT with bankAccountNumber "28002111480"
-3. POST /customer → cust_id
-4. POST /invoice with embedded orders → done!
+### Create and send invoice (simple): 3 calls + setup if needed
+1. GET /customer?organizationNumber=ORG&fields=id,name → use existing or POST /customer if not found
+2. POST /invoice with embedded orders → done!
+3. If step 2 fails: fix VAT/bank (see Sandbox Setup) and retry
 
-### Register payment: 5-8 calls
-1. VAT + bank account setup if needed
-2. POST /customer → cust_id
-3. POST /invoice (sendToCustomer=true) → invoice_id. Read "amount" from response (this is total INCLUDING VAT)
-4. GET /invoice/paymentType?fields=id,description → payment type ID
-5. PUT /invoice/{{id}}/:payment?paymentDate={today}&paymentTypeId=PT_ID&paidAmount=AMOUNT_FROM_STEP_3
+### Create invoice with product lines: N+2 calls
+1. GET /customer?organizationNumber=ORG&fields=id,name → use existing. POST only if not found.
+2. GET /product?fields=id,name,number → find all products, match by number. POST only if not found.
+3. POST /invoice with order lines referencing each product via "product": {{"id": PROD_ID}}
+Customer and products are usually pre-created for this task type!
+
+### Register payment on EXISTING invoice: 4 calls (entities pre-exist!)
+1. GET /customer?organizationNumber=ORG_NR&fields=id,name → find EXISTING customer
+2. GET /invoice?customerId=ID&invoiceDateFrom=2024-01-01&invoiceDateTo=2026-12-31&fields=id,amount,amountOutstanding → find EXISTING invoice. Read "amount" (total INCLUDING VAT)
+3. GET /invoice/paymentType?fields=id,description → payment type ID
+4. PUT /invoice/{{id}}/:payment?paymentDate={today}&paymentTypeId=PT_ID&paidAmount=AMOUNT_FROM_STEP_2
+Do NOT create new customer/invoice — they are pre-created!
+
+### Create invoice AND register payment (new entities): 5 calls
+1. POST /customer → cust_id
+2. POST /invoice (sendToCustomer=true) → invoice_id + read "amount"
+3. GET /invoice/paymentType?fields=id,description → payment type ID
+4. PUT /invoice/{{id}}/:payment?paymentDate={today}&paymentTypeId=PT_ID&paidAmount=AMOUNT
+If invoice fails: fix VAT/bank and retry
 
 ### Create employee: 2-3 calls
 1. GET /department?fields=id → dept_id
@@ -190,20 +271,38 @@ POST /supplier with name, organizationNumber, isSupplier, email
 
 ### Create project with new PM: 5-7 calls
 1. GET /department?fields=id + GET /token/session/>whoAmI?fields=companyId
-2. POST /customer → cust_id
-3. POST /employee (EXTENDED, dateOfBirth, department) → emp_id
-4. POST /employee/entitlement (entitlementId: 45) then (entitlementId: 10)
-5. POST /project (name, projectManager, customer, startDate)
+2. GET /customer?organizationNumber=ORG&fields=id,name → use existing or POST if not found
+3. GET /employee?email=EMAIL&fields=id,firstName,lastName → use existing or POST if not found
+4. POST /employee/entitlement (entitlementId: 45) then (entitlementId: 10) — only if employee was just created
+5. POST /project (name, projectManager, customer, startDate, isFixedPrice, fixedprice if applicable)
+
+### Fixed-price project + partial invoice: 8-12 calls
+1. Setup: GET dept + GET whoAmI
+2. GET /customer?organizationNumber=ORG → use existing or POST if not found
+3. GET /employee?email=EMAIL → use existing or POST if not found + grant PM entitlements
+4. POST /project with isFixedPrice: true, fixedprice: AMOUNT → project_id
+5. POST /invoice with order referencing project: {{"id": PROJECT_ID}} and orderLine amount = percentage of fixedprice
+   NOTE: Link the order to the project! Follow the VAT rules from the Language Detection section above.
 
 ### Delete travel expense: 2 calls
 1. GET /travelExpense?fields=id → find it
 2. DELETE /travelExpense/{{id}}
 
-### Credit note: find invoice + 1 call
-PUT /invoice/{{id}}/:createCreditNote?date={today}
+### Credit note for existing invoice: 3 calls (entity already exists!)
+1. GET /customer?organizationNumber=ORG_NR&fields=id,name → find EXISTING customer
+2. GET /invoice?customerId=ID&invoiceDateFrom=2024-01-01&invoiceDateTo=2026-12-31&fields=id,invoiceNumber,amount,amountOutstanding → find EXISTING invoice
+3. PUT /invoice/{{id}}/:createCreditNote?date={today}
+Do NOT create a new customer or invoice — they are pre-created by the competition!
 
 ### Reverse voucher: find + 1 call
 PUT /ledger/voucher/{{id}}/:reverse
+
+### Reverse a payment on an invoice: 3-4 calls
+1. GET /customer?organizationNumber=ORG_NR&fields=id,name → find customer
+2. GET /invoice?customerId=ID&invoiceDateFrom=2024-01-01&invoiceDateTo=2026-12-31&fields=id,invoiceNumber,amount,amountOutstanding,voucher → find invoice
+3. GET /ledger/voucher?dateFrom=2024-01-01&dateTo=2026-12-31&fields=id,number,date,description,voucherType → find the payment voucher (description contains "Betaling:")
+4. PUT /ledger/voucher/{{payment_voucher_id}}/:reverse → reverse it
+Do NOT try PUT /invoice/:reversePayment — that endpoint does not exist! Use voucher reversal instead.
 
 ### Create multiple departments: N+1 calls
 1. GET /department?fields=id,departmentNumber → find existing departments and highest number
@@ -223,14 +322,21 @@ Example for 3 depts: if highest existing is 1, use 2, 3, 4.
 10. Payment amount = total INCLUDING VAT. Use /invoice/paymentType (not /ledger/paymentTypeOut).
 11. Voucher corrections: prefer /:reverse over DELETE.
 
-## Efficiency Rules (CRITICAL — fewer API calls = higher score)
+## Efficiency Rules (CRITICAL — fewer Tripletex API calls = higher score)
+ONLY Tripletex proxy API calls are counted. Local operations (thinking, ToolSearch) are FREE.
 - ONLY use mcp__tripletex__api_call. No Bash/WebFetch/WebSearch/Read/Write.
-- Max 10 API calls per task. Plan ALL calls BEFORE starting.
-- If something fails after 2 attempts, move on.
-- SKIP sandbox setup (VAT/bank) for non-invoice tasks (employees, customers, suppliers, products, departments).
-- Only do VAT/bank setup for invoice, payment, and credit note tasks.
-- Combine independent lookups in parallel when possible (e.g., GET department + GET whoAmI in same turn).
-- For simple tasks (create customer, supplier, product, department): aim for 1 API call. Do NOT do unnecessary GETs first.
-- For travel expenses: do NOT look up rate types/categories unless the task explicitly mentions mileage, per diem, or accommodation allowances. A basic travel expense needs only POST /travelExpense.
-- Reuse IDs from responses — NEVER re-query something you just created.
+- Plan ALL calls BEFORE starting. Every unnecessary API call hurts your score.
+- If something fails after 1 retry, move on — partial credit is better than many 4xx errors.
+- 4xx errors (400, 404, 422) REDUCE your efficiency bonus. Avoid trial-and-error.
+
+CALL MINIMIZATION:
+- Direct CREATE tasks ("Opprett kunden X"): 1 call — POST directly, no GET needed.
+- Referenced entities ("faktura TIL kunden X"): GET first — entity is likely pre-created.
+- Products with numbers in parentheses: GET /product (1 call for ALL) — they are pre-created.
+- Employee creation: 2 calls (GET /department + POST /employee). +1 if start date needed.
+- Invoice with referenced customer: GET /customer + POST /invoice = 2 calls. Fix VAT/bank only if invoice fails.
+- Payment on existing invoice: GET customer + GET invoice + GET paymentType + PUT payment = 4 calls.
+- Travel expense: use inline costs in POST body to save calls.
+- NEVER re-query something you just created — reuse the ID from the POST response.
+- SKIP VAT/bank setup for non-invoice tasks.
 """

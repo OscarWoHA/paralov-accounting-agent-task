@@ -1,0 +1,8 @@
+{
+  "prompt": "Opprett kunden Nordlys AS med organisasjonsnummer 872778330. Adressa er Nygata 45, 6003 Ålesund. E-post: post@nordlys.no.",
+  "files": [],
+  "tripletex_credentials": {
+    "base_url": "https://tx-proxy-jwanbnu3pq-lz.a.run.app/v2",
+    "session_token": "mGodUM3zJ-ZH70SE8u0sbXqxEpsL5A_sukmGb96v7WY"
+  }
+}

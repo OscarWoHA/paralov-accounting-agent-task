@@ -1,0 +1,8 @@
+{
+  "prompt": "Registrer ei reiserekning for Torbjørn Brekke (torbjrn.brekke@example.org) for \"Kundebesøk Trondheim\". Reisa varte 4 dagar med diett (dagssats 800 kr). Utlegg: flybillett 6150 kr og taxi 750 kr.",
+  "files": [],
+  "tripletex_credentials": {
+    "base_url": "https://tx-proxy-jwanbnu3pq-lz.a.run.app/v2",
+    "session_token": "wGVoLXh-sFO9wtbqjZ-bzXFM0rqeHZZKW6Nigx27k2k"
+  }
+}

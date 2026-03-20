@@ -1,0 +1,8 @@
+{
+  "prompt": "Betalingen fra Tindra AS (org.nr 939161937) for fakturaen \"Webdesign\" (24350 kr ekskl. MVA) ble returnert av banken. Reverser betalingen slik at fakturaen igjen viser utestående beløp.",
+  "files": [],
+  "tripletex_credentials": {
+    "base_url": "https://tx-proxy-jwanbnu3pq-lz.a.run.app/v2",
+    "session_token": "6x69b8NZe2qGuTMPHEC7a7OOXigZDP3RABhYAg6v9kw"
+  }
+}

@@ -53,10 +53,22 @@ def api_call(method: str, endpoint: str, params: dict | None = None, body: dict 
     except Exception:
         resp_body = response.text
 
+    # Truncate large list responses to prevent Claude context overflow
+    if isinstance(resp_body, dict) and "values" in resp_body and isinstance(resp_body["values"], list):
+        values = resp_body["values"]
+        if len(values) > 10:
+            resp_body = {**resp_body, "values": values[:10], "_truncated": f"Showing 10 of {len(values)} results"}
+
     resp_str = json.dumps(resp_body, ensure_ascii=False)[:1000] if isinstance(resp_body, (dict, list)) else str(resp_body)[:1000]
     logger.info(f"<<< {response.status_code} {resp_str}")
 
-    return json.dumps({"status_code": response.status_code, "body": resp_body}, ensure_ascii=False)
+    result = json.dumps({"status_code": response.status_code, "body": resp_body}, ensure_ascii=False)
+
+    # Hard cap at 15000 chars to prevent "result too large" errors
+    if len(result) > 15000:
+        result = result[:15000] + '..."}'
+
+    return result
 
 
 if __name__ == "__main__":

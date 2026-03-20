@@ -1,0 +1,8 @@
+{
+  "prompt": "O cliente Luz do Sol Lda (org. nº 961893283) reclamou sobre a fatura referente a \"Licença de software\" (11400 NOK sem IVA). Emita uma nota de crédito completa que reverta toda a fatura.",
+  "files": [],
+  "tripletex_credentials": {
+    "base_url": "https://kkpqfuj-amager.tripletex.dev/v2",
+    "session_token": "eyJ0b2tlbklkIjoyMTQ3NjI4NDgyLCJ0b2tlbiI6IjBhYjc0Yjg1LWZiMDEtNGZkOC1hMWFiLWY5Nzk3MWZiYjA3NiJ9"
+  }
+}
