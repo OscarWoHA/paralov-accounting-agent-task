@@ -71,11 +71,17 @@ async def solve(request: Request):
     base_url = credentials.get("base_url", "")
     is_production = "tx-proxy" in base_url
     env_tag = "PROD" if is_production else "DEV"
-    ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+    ts = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
     session_file = os.path.join(SESSIONS_DIR, f"{env_tag}_{ts}.log")
     file_handler = logging.FileHandler(session_file, encoding="utf-8")
     file_handler.setLevel(logging.INFO)
     file_handler.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(name)s: %(message)s"))
+    # Use a unique logger per session to avoid cross-contamination on concurrent runs
+    session_logger_name = f"session_{ts}"
+    session_logger = logging.getLogger(session_logger_name)
+    session_logger.addHandler(file_handler)
+    session_logger.setLevel(logging.INFO)
+    # Also add to root so agent_v3 logs land here (but accept some bleed on concurrent runs)
     root_logger = logging.getLogger()
     root_logger.addHandler(file_handler)
 
