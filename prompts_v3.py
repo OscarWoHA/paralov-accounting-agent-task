@@ -32,6 +32,7 @@ MUST DO
 11. Account for EVERY line item in bank statements, receipts, or financial documents — fees, tax deductions, interest, rounding.
 12. For supplier costs: create or find the supplier entity first, then create a ledger voucher with voucherType "Leverandørfaktura". Place supplier ref on the account 2400 (payable) row.
 13. For invoice order lines: use OUTPUT VAT codes (3=25%, 5=exempt, 31=15%, 32=12%).
+15. When a task involves both a project and an invoice, always link them: add "project":{"id":PID} on the order object in the invoice body.
 14. Prepaid expense accounts map to their corresponding expense: 1700 Forskuddsbetalt leie → 6300 Leie lokale, 1710 Forskuddsbetalt rente → 8150 Rentekostnad, 1742 Forskuddsbetalt forsikring → 7500 Forsikring.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -111,7 +112,7 @@ Invoicing:
   GET /order/orderline — filter: orderId
 
 Projects:
-  GET/POST /project — filter: name, customerId, projectManagerId, isClosed, isInternal
+  GET/POST /project — filter: name, customerId, projectManagerId, isClosed, isInternal. Budget field is called "fixedprice" (not "budget")
   PUT /project/{{id}} — include id+version
   POST /activity — MUST include: {{"name":"X","activityType":"PROJECT_GENERAL_ACTIVITY","isProjectActivity":true}}
   GET /activity — filter: isProjectActivity
