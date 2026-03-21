@@ -1,0 +1,8 @@
+{
+  "prompt": "Registre una nota de gastos de viaje para Pablo Sánchez (pablo.sanchez@example.org) por \"Conferencia Drammen\". El viaje duró 3 días con dietas (tarifa diaria 800 NOK). Gastos: billete de avión 7050 NOK y taxi 550 NOK.",
+  "files": [],
+  "tripletex_credentials": {
+    "base_url": "https://tx-proxy-jwanbnu3pq-lz.a.run.app/v2",
+    "session_token": "_6-NpPaaI5JOsIMBFiyzFWSc1_Xy54IVQPxOXM5r4CM"
+  }
+}

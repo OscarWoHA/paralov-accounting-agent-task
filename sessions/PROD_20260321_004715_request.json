@@ -1,0 +1,8 @@
+{
+  "prompt": "Registrer en reiseregning for Ingrid Larsen (ingrid.larsen@example.org) for \"Kundebesøk Trondheim\". Reisen varte 2 dager med diett (dagsats 800 kr). Utlegg: flybillett 2500 kr og taxi 600 kr.",
+  "files": [],
+  "tripletex_credentials": {
+    "base_url": "https://tx-proxy-jwanbnu3pq-lz.a.run.app/v2",
+    "session_token": "pIPYTl5j5X-HMQ9tr3KInoDVv0Z6uxGqx1OpCRr5IcY"
+  }
+}

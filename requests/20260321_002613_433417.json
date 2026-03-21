@@ -1,0 +1,8 @@
+{
+  "prompt": "Enregistrez 16 heures pour Camille Dubois (camille.dubois@example.org) sur l'activité \"Design\" du projet \"Mise à niveau système\" pour Océan SARL (nº org. 953748460). Taux horaire : 1300 NOK/h. Générez une facture de projet au client basée sur les heures enregistrées.",
+  "files": [],
+  "tripletex_credentials": {
+    "base_url": "https://tx-proxy-jwanbnu3pq-lz.a.run.app/v2",
+    "session_token": "m_t0YwVFEOUd2OlYJ8FDZ67bET107uCcCj4eBiIMMFU"
+  }
+}

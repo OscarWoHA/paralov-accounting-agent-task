@@ -1,0 +1,8 @@
+{
+  "prompt": "Køyr løn for Sigrid Brekke (sigrid.brekke@example.org) for denne månaden. Grunnløn er 34950 kr. Legg til ein eingongsbonus på 15350 kr i tillegg til grunnløna.",
+  "files": [],
+  "tripletex_credentials": {
+    "base_url": "https://kkpqfuj-amager.tripletex.dev/v2",
+    "session_token": "eyJ0b2tlbklkIjoyMTQ3NjI4NDgyLCJ0b2tlbiI6IjBhYjc0Yjg1LWZiMDEtNGZkOC1hMWFiLWY5Nzk3MWZiYjA3NiJ9"
+  }
+}

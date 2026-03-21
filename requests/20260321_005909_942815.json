@@ -1,0 +1,8 @@
+{
+  "prompt": "Opprett en fri regnskapsdimensjon \"Kostsenter\" med verdiene \"Innkjøp\" og \"Logistikk\". Bokfør deretter et bilag på konto 6590 for 34250 kr, knyttet til dimensjonsverdien \"Innkjøp\".",
+  "files": [],
+  "tripletex_credentials": {
+    "base_url": "https://tx-proxy-jwanbnu3pq-lz.a.run.app/v2",
+    "session_token": "Nej45AT124-W1kQz5P9Wafjx04O9iODfsiUAW7S1BkI"
+  }
+}

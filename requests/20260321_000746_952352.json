@@ -1,0 +1,8 @@
+{
+  "prompt": "Run payroll for William Taylor (william.taylor@example.org) for this month. The base salary is 39400 NOK. Add a one-time bonus of 11800 NOK on top of the base salary. If the salary API is unavailable, you can use manual vouchers on salary accounts (5000-series) to record the payroll expense.",
+  "files": [],
+  "tripletex_credentials": {
+    "base_url": "https://kkpqfuj-amager.tripletex.dev/v2",
+    "session_token": "eyJ0b2tlbklkIjoyMTQ3NjI4NDgyLCJ0b2tlbiI6IjBhYjc0Yjg1LWZiMDEtNGZkOC1hMWFiLWY5Nzk3MWZiYjA3NiJ9"
+  }
+}

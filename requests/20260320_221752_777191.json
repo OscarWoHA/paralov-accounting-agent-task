@@ -1,0 +1,8 @@
+{
+  "prompt": "Kunden Stormberg AS (org.nr 906691639) har en utestående faktura på 33650 kr eksklusiv MVA for \"Programvarelisens\". Registrer full betaling på denne fakturaen.",
+  "files": [],
+  "tripletex_credentials": {
+    "base_url": "https://tx-proxy-jwanbnu3pq-lz.a.run.app/v2",
+    "session_token": "vOU4Y_Uz8NBmwLmEHVd8vrisaJDAU9CW9QRrRcvtPnc"
+  }
+}

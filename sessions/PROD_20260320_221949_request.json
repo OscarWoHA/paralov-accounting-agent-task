@@ -1,0 +1,8 @@
+{
+  "prompt": "We have received invoice INV-2026-4606 from the supplier Silveroak Ltd (org no. 973931156) for 14650 NOK including VAT. The amount relates to office services (account 6500). Register the supplier invoice with the correct input VAT (25%).",
+  "files": [],
+  "tripletex_credentials": {
+    "base_url": "https://tx-proxy-jwanbnu3pq-lz.a.run.app/v2",
+    "session_token": "MSStpC3ZD_nmbvXnkEhXqBCa-3_g6crrHvXt6Qszqv4"
+  }
+}

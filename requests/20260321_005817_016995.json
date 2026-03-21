@@ -1,0 +1,8 @@
+{
+  "prompt": "Recebemos a fatura INV-2026-3196 do fornecedor Montanha Lda (org. nº 810189096) no valor de 21350 NOK com IVA incluído. O montante refere-se a serviços de escritório (conta 6340). Registe a fatura do fornecedor com o IVA dedutível correto (25 %).",
+  "files": [],
+  "tripletex_credentials": {
+    "base_url": "https://tx-proxy-jwanbnu3pq-lz.a.run.app/v2",
+    "session_token": "8d5xT9DOGH2wshthQrjAlepu-1sBuj2ODWCs3Af9Xeg"
+  }
+}

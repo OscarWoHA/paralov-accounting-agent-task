@@ -50,15 +50,8 @@ def build_agent_prompt(prompt: str, files: list) -> str:
         "You have the `mcp__tripletex__api_call` tool available. Use it to make API calls.",
         "Do NOT use Bash, Read, Write, or any other tool. Only use `mcp__tripletex__api_call`.",
         "",
-        "BEFORE making any API calls, you MUST first output a plan:",
-        "1. For each entity: is the task CREATING it ('Opprett kunden X') or REFERENCING it ('faktura til kunden X')? Create → POST. Reference → GET first.",
-        "2. Products with numbers in parentheses are ALWAYS pre-created → GET first, never POST.",
-        "3. List the EXACT API calls in order with endpoints and field values",
-        "4. VAT: does the prompt mention MVA/VAT/IVA/MwSt? If yes with 'eksklusiv'/'ohne'/'sem'/'sin'/'HT' → vatType 3. If 'uten'/'mva-fritt'/'exento'/'befreit' → omit. If no VAT mentioned at all → omit.",
-        "5. Product numbers in parentheses = pre-created products. GET /product to find them.",
-        "6. Count planned calls — minimize them.",
-        "",
-        "Only AFTER writing out the full plan, start executing the API calls.",
+        "BRIEFLY plan (max 3 lines), then IMMEDIATELY start making API calls. Be fast — time is limited!",
+        "Key decisions: CREATE or GET? VAT or no VAT? Which entities are referenced?",
         "",
     ]
 
@@ -92,7 +85,8 @@ async def run_agent(prompt: str, files: list, credentials: dict) -> None:
 
         options = ClaudeCodeOptions(
             append_system_prompt=get_system_prompt(),
-            model="opus",
+            model="sonnet",
+            continue_conversation=False,
             allowed_tools=["mcp__tripletex__api_call", "ToolSearch"],
             mcp_servers={
                 "tripletex": McpStdioServerConfig(

@@ -1,0 +1,8 @@
+{
+  "prompt": "Sett fastpris 316000 kr på prosjektet \"Automatiseringsprosjekt\" for Sjøbris AS (org.nr 825338756). Prosjektleiar er Knut Kvamme (knut.kvamme@example.org). Fakturer kunden for 50 % av fastprisen som ei delbetaling.",
+  "files": [],
+  "tripletex_credentials": {
+    "base_url": "https://tx-proxy-jwanbnu3pq-lz.a.run.app/v2",
+    "session_token": "Jv2wwUrUf1iMQi3B7ptkYhbDhPn-cmyuysSUQTcM5nM"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "prompt": "Erstellen Sie eine Rechnung für den Kunden Grünfeld GmbH (Org.-Nr. 913178823) mit drei Produktzeilen: Netzwerkdienst (6475) zu 6400 NOK mit 25 % MwSt., Softwarelizenz (3355) zu 2450 NOK mit 15 % MwSt. (Lebensmittel), und Webdesign (3067) zu 12300 NOK mit 0 % MwSt. (befreit).",
+  "files": [],
+  "tripletex_credentials": {
+    "base_url": "https://tx-proxy-jwanbnu3pq-lz.a.run.app/v2",
+    "session_token": "mPxpW6DXOj64TUzxJCFUEvvQHgcmzs3oai0YE-Q0X54"
+  }
+}

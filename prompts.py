@@ -12,6 +12,25 @@ Today's date: {today}
 - List: {{"fullResultSize": N, "values": [...]}}. Single: {{"value": {{...}}}}
 - Dates: "YYYY-MM-DD". References: {{"id": N}}
 
+## Available Endpoint Paths (if unsure, check this list before guessing!)
+/employee, /employee/employment, /employee/employment/details, /employee/entitlement
+/customer, /supplier, /contact, /product, /department, /project
+/project/projectActivity, /project/orderline, /project/hourlyRates, /project/participant, /project/category
+/invoice, /invoice/paymentType, /invoice/details, /invoiceRemark, /reminder
+/order, /order/orderline, /order/orderGroup
+/travelExpense, /travelExpense/cost, /travelExpense/costCategory, /travelExpense/paymentType
+/travelExpense/mileageAllowance, /travelExpense/perDiemCompensation, /travelExpense/accommodationAllowance
+/travelExpense/rate, /travelExpense/rateCategory, /travelExpense/zone, /travelExpense/settings
+/ledger/account, /ledger/voucher, /ledger/voucherType, /ledger/posting, /ledger/vatType, /ledger/vatSettings
+/ledger/accountingDimensionName, /ledger/accountingDimensionValue
+/ledger/paymentTypeOut, /ledger/closeGroup, /ledger/annualAccount
+/salary/payslip, /salary/transaction, /salary/type, /salary/settings, /salary/compilation
+/company, /company/salesmodules, /company/settings/altinn
+/supplierInvoice, /incomingInvoice, /purchaseOrder
+/bank, /bank/reconciliation, /bank/statement
+/timesheet/entry, /timesheet/settings, /activity
+/token/session, /currency, /country, /municipality
+
 ## Field Names Reference (use these EXACT names in ?fields= queries)
 - customer: id, name, organizationNumber, email, phoneNumber, phoneNumberMobile, postalAddress, physicalAddress, deliveryAddress, isCustomer, isSupplier, isPrivateIndividual, invoiceSendMethod, invoiceEmail
 - supplier: id, name, organizationNumber, email, phoneNumber, isSupplier, isCustomer, postalAddress, physicalAddress
@@ -28,6 +47,7 @@ Today's date: {today}
 - invoice: id, invoiceNumber, invoiceDate, invoiceDueDate, amount, amountExcludingVat, amountOutstanding, amountCurrency, customer, orders, orderLines, voucher, isCredited, isCreditNote, creditedInvoice
 - ledger/voucher: id, number, date, description, voucherType, reverseVoucher, postings
 - travelExpense: id, title, employee, travelDetails, costs, perDiemCompensations, mileageAllowances, accommodationAllowances, state, amount
+- travelExpense/zone: id, countryCode, zoneName, isDisabled, governmentName, continent, fromDate, toDate, currencyId (NOT code, NOT name, NOT description, NOT isDefault)
 - IMPORTANT: GET /invoice REQUIRES invoiceDateFrom and invoiceDateTo params! Use "2024-01-01" and "2026-12-31" as range.
 - Invoice does NOT have "status" or "payments" fields. Use amountOutstanding to check payment status.
 - NEVER set "id" on new objects. PUT /:action endpoints use QUERY PARAMS, not body.
@@ -89,7 +109,19 @@ Useful lookups (only when needed):
 
 ## Special Tasks
 - "Do nothing" / "Gjør ingenting" → Make ZERO API calls. Just say DONE immediately.
-- Do NOT use POST /incomingInvoice — returns 403 on competition accounts.
+- For payroll/salary tasks ("lønn"/"payroll"/"salary"/"Gehalt"/"køyr løn"):
+  Try POST /salary/transaction first. If it returns 403 or 422, fall back IMMEDIATELY to voucher.
+  Do NOT keep trying different salary endpoints — fall back after 1 failed attempt.
+  Voucher fallback: POST /ledger/voucher with voucherType "Lønnsbilag":
+  Separate postings for base salary and bonus. Debit 5000 (Lønn), credit 2920 (Skyldig lønn). Employee ref on all postings.
+- For supplier/incoming invoices ("Lieferantenrechnung"/"leverandørfaktura"/"facture fournisseur"/"factura del proveedor"):
+  The supplier invoice is PRE-CREATED by the competition. Find and update it:
+  1. GET /supplier?organizationNumber=ORG&fields=id,name → find supplier
+  2. GET /supplierInvoice?invoiceDateFrom=2024-01-01&invoiceDateTo=2026-12-31&supplierId=SUPP_ID&fields=id,invoiceNumber,amount,voucher(id) → find the pre-created invoice
+  3. If found: check if voucher has postings. If no postings, use PUT /supplierInvoice/voucher/{{voucherId}}/postings to add them.
+  4. If NOT found: fall back to POST /ledger/voucher with voucherType "Leverandørfaktura":
+     Debit expense account with vatType 1 (input VAT 25%), credit account 2400 with supplier ref. Include amountGross AND amountGrossCurrency.
+  vatType 1 = input VAT 25% (inngående MVA). "inklusiv MVA"/"con IVA incluido" = amountGross IS the total including VAT.
 - If POST /employee fails with "Det finnes allerede en bruker med denne e-postadressen" (email already exists) → the employee is pre-created. Search with GET /employee?email=EMAIL&fields=id,firstName,lastName to find their ID, then continue.
 
 ## Endpoints Reference
@@ -151,7 +183,8 @@ VAT type IDs for order lines (MUST use OUTPUT codes, not input):
 - vatType 3 = 25% (høy sats / standard) — most common
 - vatType 31 = 15% (middels sats / food products)
 - vatType 32 = 12% (lav sats / transport, cinema, hotels)
-- Omit vatType = 0% (no VAT). Use for "uten mva"/"mva-fritt"/exempt.
+- vatType 5 = 0% exempt within VAT act (avgiftsfri innenfor mva-loven). Use for "exento"/"befreit"/"exempt"/"avgiftsfri"/"0 % IVA"/"0 % MVA".
+Do NOT omit vatType for exempt lines — use vatType 5 explicitly!
 Only works after VAT registration. Do NOT use input VAT codes (1, 11, 12) on order lines.
 Discount on order line: "discount": 10 = 10% discount.
 sendToCustomer=true is default (auto-sends). Set false to create without sending.
@@ -172,8 +205,8 @@ Types: SOFT_REMINDER, REMINDER, NOTICE_OF_DEBT_COLLECTION, DEBT_COLLECTION
 
 ### Travel Expenses (reiseregning/reiserekning/travel expense/Reisekosten/note de frais)
 POST /travelExpense — minimal: {{"employee": {{"id": EMP_ID}}, "title": "Reise til Oslo"}}
-With travel details: add "travelDetails": {{"isForeignTravel": false, "isDayTrip": BOOL, "departureDate": "YYYY-MM-DD", "returnDate": "YYYY-MM-DD", "departureFrom": "City", "destination": "City", "purpose": "Purpose"}}
-isDayTrip: true if same-day trip, false if multi-day (departure != return date).
+With travel details: add "travelDetails": {{"isForeignTravel": false, "isDayTrip": BOOL, "departureDate": "YYYY-MM-DD", "returnDate": "YYYY-MM-DD", "departureFrom": "Oslo", "destination": "City", "departureTime": "08:00", "returnTime": "17:00", "purpose": "Purpose"}}
+isDayTrip: true if same-day trip, false if multi-day. ALWAYS include departureFrom, departureTime, returnTime.
 IMPORTANT: isForeignTravel must be explicitly set to true for foreign travel — NOT auto-detected from destination.
 EFFICIENT cost approach: Embed costs INLINE in the POST /travelExpense body to save API calls:
 {{"employee": {{"id": EMP_ID}}, "title": "Trip", "costs": [{{"paymentType": {{"id": PT_ID}}, "costCategory": {{"id": CAT_ID}}, "date": "YYYY-MM-DD", "amountCurrencyIncVat": 350.00, "comments": "Taxi"}}]}}
@@ -181,12 +214,25 @@ To get paymentType and costCategory IDs: GET /travelExpense/paymentType + GET /t
 If adding costs separately: POST /travelExpense/cost with travelExpense ref.
 Cost categories: Hotell, Fly, Taxi, Drivstoff, etc. Use "comments" NOT "description" on costs.
 Mileage ("kilometergodtgjørelse"): POST /travelExpense/mileageAllowance with rateType ref, date, departureLocation, destination, km. If prompt specifies a rate per km, include "rate": AMOUNT. Get rateType from GET /travelExpense/rateCategory?type=MILEAGE_ALLOWANCE&fields=id,name
-Per diem ("diett"/"dagssats"): POST /travelExpense/perDiemCompensation with rateType ref, location, count.
-IMPORTANT: If the prompt specifies a daily rate (e.g., "dagssats 800 kr"), include "rate": 800 in the body to OVERRIDE the system default rate. Without it, Tripletex uses its own standard rate which will be wrong!
-Example: {{"travelExpense": {{"id": TE_ID}}, "rateType": {{"id": RATE_ID}}, "location": "Trondheim", "count": 4, "rate": 800}}
-Rate categories must be date-valid for the expense date. Use GET /travelExpense/rateCategory?type=PER_DIEM&fields=id,name to find valid categories.
+Per diem ("diett"/"dagssats"): EMBED INLINE in POST /travelExpense body as "perDiemCompensations" array (saves 1 API call):
+{{"perDiemCompensations": [{{"rateType": {{"id": RATE_ID}}, "location": "City", "count": N, "rate": 800, "overnightAccommodation": "HOTEL"}}]}}
+If the prompt specifies a daily rate (e.g., "dagssats 800 kr"), include "rate": 800 to OVERRIDE the system default.
+For multi-day trips, set "overnightAccommodation": "HOTEL". count = number of DAYS the trip lasted.
+If inline fails, use separate POST /travelExpense/perDiemCompensation as fallback.
+To find the correct per diem rateType (TWO-STEP lookup — rateCategory and rate are DIFFERENT!):
+Step 1: GET /travelExpense/rateCategory?type=PER_DIEM&fields=id,name,fromDate,toDate&count=100
+Filter for 2026-valid entries with name matching the trip type:
+- Multi-day domestic → "Overnatting over 12 timer - innland"
+- Day trip domestic → "Dagsreise 6-12 timer - innland" or "Dagsreise over 12 timer - innland"
+- Foreign trip → same names with "utland"
+Use the LAST matching entry (highest ID).
+Step 2: GET /travelExpense/rate?rateCategoryId=CATEGORY_ID&fields=id,rate
+Get the rate ID from this response. Use THIS rate ID (NOT the category ID!) in rateType.
+CRITICAL: rateType expects a RATE id from /travelExpense/rate, NOT a rateCategory id! Using the category ID gives utland instead of innland!
 Accommodation ("overnatting"): POST /travelExpense/accommodationAllowance with rateType ref, location, count. If prompt specifies a rate, include "rate": AMOUNT.
 DELETE /travelExpense/{{id}} → 204 on success
+After creating and adding all costs/per diem, DELIVER: PUT /travelExpense/:deliver?id={{TE_ID}}
+If deliver fails, do NOT attempt to fix it — just say DONE. Do NOT search for zones or retry. 1 attempt max.
 "utlegg" (expense reimbursement) also uses /travelExpense endpoint.
 NOTE: Requires WAGE module. If travel expense fails with permission error, activate: POST /company/salesmodules {{"name": "SMART_WAGE"}}
 
@@ -195,6 +241,13 @@ POST /project — required: name, projectManager (ref), startDate
 {{"name": "Project X", "projectManager": {{"id": EMP_ID}}, "customer": {{"id": CUST_ID}}, "startDate": "{today}"}}
 For fixed-price projects: set isFixedPrice: true and fixedprice: AMOUNT in the POST body.
 PM needs entitlementId 10 (AUTH_PROJECT_MANAGER). isInternal: true for internal projects.
+
+### Timesheet / Hours Registration
+POST /timesheet/entry — register hours for an employee on a project activity
+{{"employee": {{"id": EMP_ID}}, "project": {{"id": PROJ_ID}}, "activity": {{"id": ACT_ID}}, "date": "YYYY-MM-DD", "hours": 15}}
+Activities: GET /activity?fields=id,name to find activity by name (e.g., "Design").
+Link activity to project: POST /project/projectActivity {{"project": {{"id": PROJ_ID}}, "activity": {{"id": ACT_ID}}}}
+Set hourly rate: PUT /project/hourlyRates/{{id}} with fixedRate: AMOUNT, hourlyRateModel: "TYPE_FIXED_HOURLY_RATE"
 
 ### Project Invoicing (invoicing linked to a project)
 When invoicing for a project, the order MUST reference the project via "project" field.
@@ -220,6 +273,11 @@ Example: {{"date": "{today}", "description": "Manual entry", "postings": [{{"row
 PUT /ledger/voucher/{{id}}/:reverse — REVERSE a voucher (preferred correction method)
 DELETE /ledger/voucher/{{id}} — only works for LAST voucher in sequence
 For invoices: use credit notes (PUT /:createCreditNote), NOT delete.
+
+### Free Accounting Dimensions (fri regnskapsdimensjon)
+POST /ledger/accountingDimensionName — create dimension: {{"name": "Prosjekttype"}}
+POST /ledger/accountingDimensionValue — create value: {{"name": "Forskning", "dimensionName": {{"id": DIM_NAME_ID}}}}
+Link to voucher posting via freeDimension1/freeDimension2/freeDimension3 field on the posting.
 
 ### Ledger
 GET /ledger/account?number=1920&fields=id,version,bankAccountNumber — bank account

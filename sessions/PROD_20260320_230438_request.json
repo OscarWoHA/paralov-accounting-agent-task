@@ -1,0 +1,8 @@
+{
+  "prompt": "Créez et envoyez une facture au client Lumière SARL (nº org. 827689114) de 8750 NOK hors TVA. La facture concerne Maintenance.",
+  "files": [],
+  "tripletex_credentials": {
+    "base_url": "https://tx-proxy-jwanbnu3pq-lz.a.run.app/v2",
+    "session_token": "wxeh3VDP6M6TYafh99TCDqzIjgtmIuokhmOX_Q9Mzkk"
+  }
+}

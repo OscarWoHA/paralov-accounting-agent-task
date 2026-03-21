@@ -1,0 +1,8 @@
+{
+  "prompt": "O pagamento de Cascata Lda (org. nº 844279892) referente à fatura \"Horas de consultoria\" (41350 NOK sem IVA) foi devolvido pelo banco. Reverta o pagamento para que a fatura volte a mostrar o montante em aberto.",
+  "files": [],
+  "tripletex_credentials": {
+    "base_url": "https://tx-proxy-jwanbnu3pq-lz.a.run.app/v2",
+    "session_token": "7GaVvI8gCw9qG2bNGfneWGf2csENO-tgCluiq6HQXyg"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "prompt": "Opprett en fri regnskapsdimensjon \"Produktlinje\" med verdiene \"Standard\" og \"Avansert\". Bokfør deretter et bilag på konto 7000 for 12700 kr, knyttet til dimensjonsverdien \"Standard\".",
+  "files": [],
+  "tripletex_credentials": {
+    "base_url": "https://tx-proxy-jwanbnu3pq-lz.a.run.app/v2",
+    "session_token": "KN9Gy4c2u-EiVNqGDhuYIISCzlXu7B1vj5DMPXspNJw"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "prompt": "Create a custom accounting dimension \"Prosjekttype\" with the values \"Eksternt\" and \"Utvikling\". Then post a voucher on account 7300 for 29950 NOK, linked to the dimension value \"Eksternt\".",
+  "files": [],
+  "tripletex_credentials": {
+    "base_url": "https://tx-proxy-jwanbnu3pq-lz.a.run.app/v2",
+    "session_token": "0BuRksDuxSs1HHyk4nkW4rJR7384xl7ZnFus1b2nddA"
+  }
+}

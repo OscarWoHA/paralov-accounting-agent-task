@@ -1,0 +1,8 @@
+{
+  "prompt": "Enregistrez une note de frais de déplacement pour Emma Robert (emma.robert@example.org) pour \"Conférence Ålesund\". Le voyage a duré 2 jours avec indemnités journalières (taux journalier 800 NOK). Dépenses : billet d'avion 7050 NOK et taxi 350 NOK.",
+  "files": [],
+  "tripletex_credentials": {
+    "base_url": "https://tx-proxy-jwanbnu3pq-lz.a.run.app/v2",
+    "session_token": "gkC0ySa_6Q1E0FGiIvpmlgZlsytTx8SEIJ-q4Go3E84"
+  }
+}

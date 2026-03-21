@@ -1,0 +1,8 @@
+{
+  "prompt": "Crea un pedido para el cliente Luna SL (org. nº 800572525) con los productos Informe de análisis (6174) a 7950 NOK y Diseño web (5787) a 2350 NOK. Convierte el pedido en factura y registra el pago completo.",
+  "files": [],
+  "tripletex_credentials": {
+    "base_url": "https://tx-proxy-jwanbnu3pq-lz.a.run.app/v2",
+    "session_token": "QccuHiRJ8nXdISHUMFcif8ScMGJ1fhwj7Uf-4kI5h84"
+  }
+}

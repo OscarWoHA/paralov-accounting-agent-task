@@ -1,0 +1,8 @@
+{
+  "prompt": "Créez le projet \"Migration Étoile\" lié au client Étoile SARL (nº org. 964531161). Le chef de projet est Arthur Dubois (arthur.dubois@example.org).",
+  "files": [],
+  "tripletex_credentials": {
+    "base_url": "https://tx-proxy-jwanbnu3pq-lz.a.run.app/v2",
+    "session_token": "HJePYRxYCGVx1QTxW5gzXfOcdBryJpAD0lgxK0Rd8Fc"
+  }
+}

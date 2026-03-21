@@ -1,0 +1,8 @@
+{
+  "prompt": "Wir haben die Rechnung INV-2026-2399 vom Lieferanten Waldstein GmbH (Org.-Nr. 859252303) über 5550 NOK einschließlich MwSt. erhalten. Der Betrag betrifft Bürodienstleistungen (Konto 7100). Erfassen Sie die Lieferantenrechnung mit der korrekten Vorsteuer (25 %).",
+  "files": [],
+  "tripletex_credentials": {
+    "base_url": "https://tx-proxy-jwanbnu3pq-lz.a.run.app/v2",
+    "session_token": "Lj9mSxbUz7CxBvdld1-qikI9iLssybdZM9usotwOBqM"
+  }
+}

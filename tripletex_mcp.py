@@ -36,7 +36,7 @@ def api_call(method: str, endpoint: str, params: dict | None = None, body: dict 
     url = f"{BASE_URL}{endpoint}"
     auth = ("0", TOKEN)
 
-    body_str = json.dumps(body, ensure_ascii=False)[:500] if body else None
+    body_str = json.dumps(body, ensure_ascii=False) if body else None
     logger.info(f">>> {method} {endpoint} params={params} body={body_str}")
 
     response = httpx.request(
@@ -56,10 +56,10 @@ def api_call(method: str, endpoint: str, params: dict | None = None, body: dict 
     # Truncate large list responses to prevent Claude context overflow
     if isinstance(resp_body, dict) and "values" in resp_body and isinstance(resp_body["values"], list):
         values = resp_body["values"]
-        if len(values) > 10:
-            resp_body = {**resp_body, "values": values[:10], "_truncated": f"Showing 10 of {len(values)} results"}
+        if len(values) > 40:
+            resp_body = {**resp_body, "values": values[:40], "_truncated": f"Showing 40 of {len(values)} results"}
 
-    resp_str = json.dumps(resp_body, ensure_ascii=False)[:1000] if isinstance(resp_body, (dict, list)) else str(resp_body)[:1000]
+    resp_str = json.dumps(resp_body, ensure_ascii=False) if isinstance(resp_body, (dict, list)) else str(resp_body)
     logger.info(f"<<< {response.status_code} {resp_str}")
 
     result = json.dumps({"status_code": response.status_code, "body": resp_body}, ensure_ascii=False)

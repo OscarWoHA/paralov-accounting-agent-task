@@ -1,0 +1,8 @@
+{
+  "prompt": "Registrer ei reiserekning for Svein Vik (svein.vik@example.org) for \"Kundebesøk Bergen\". Reisa varte 5 dagar med diett (dagssats 800 kr). Utlegg: flybillett 7900 kr og taxi 250 kr.",
+  "files": [],
+  "tripletex_credentials": {
+    "base_url": "https://tx-proxy-jwanbnu3pq-lz.a.run.app/v2",
+    "session_token": "Zr9Urk4Kf3dwMxAOPu_cR4SbJ0xmMgu_8P9qsw-C2DU"
+  }
+}

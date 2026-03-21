@@ -1,0 +1,8 @@
+{
+  "prompt": "Erfassen Sie 18 Stunden für Mia Meyer (mia.meyer@example.org) auf der Aktivität \"Testing\" im Projekt \"Sicherheitsaudit\" für Nordlicht GmbH (Org.-Nr. 934651995). Stundensatz: 1400 NOK/h. Erstellen Sie eine Projektrechnung an den Kunden basierend auf den erfassten Stunden.",
+  "files": [],
+  "tripletex_credentials": {
+    "base_url": "https://tx-proxy-jwanbnu3pq-lz.a.run.app/v2",
+    "session_token": "jFCPYOzppcijcRBFH535B1KX8cRMowaJcs6Ie6PMlr8"
+  }
+}

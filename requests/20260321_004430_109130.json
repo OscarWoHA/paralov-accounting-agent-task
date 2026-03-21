@@ -1,0 +1,8 @@
+{
+  "prompt": "Registrer ei reiserekning for Marit Vik (marit.vik@example.org) for \"Konferanse Kristiansand\". Reisa varte 4 dagar med diett (dagssats 800 kr). Utlegg: flybillett 7600 kr og taxi 600 kr.",
+  "files": [],
+  "tripletex_credentials": {
+    "base_url": "https://tx-proxy-jwanbnu3pq-lz.a.run.app/v2",
+    "session_token": "pb_hwX6Gz0c84ykFOL57Z4iwBrNAExcU7SJSW48kRzI"
+  }
+}

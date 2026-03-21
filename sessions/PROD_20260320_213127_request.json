@@ -1,0 +1,8 @@
+{
+  "prompt": "O pagamento de Solmar Lda (org. nº 991509054) referente à fatura \"Armazenamento na nuvem\" (30900 NOK sem IVA) foi devolvido pelo banco. Reverta o pagamento para que a fatura volte a mostrar o montante em aberto.",
+  "files": [],
+  "tripletex_credentials": {
+    "base_url": "https://tx-proxy-jwanbnu3pq-lz.a.run.app/v2",
+    "session_token": "YncB7SNXsUu2Fewk34ah3PhtaMMrCzrdEOovYUYstC4"
+  }
+}

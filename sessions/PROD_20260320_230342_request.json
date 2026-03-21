@@ -1,0 +1,8 @@
+{
+  "prompt": "El cliente Luna SL (org. nº 982580110) ha reclamado sobre la factura por \"Almacenamiento en la nube\" (31750 NOK sin IVA). Emita una nota de crédito completa que revierta toda la factura.",
+  "files": [],
+  "tripletex_credentials": {
+    "base_url": "https://tx-proxy-jwanbnu3pq-lz.a.run.app/v2",
+    "session_token": "t4Mtt6nKrMciBls_3PFYg2bHp9Az-WciHSb4kpu_Urg"
+  }
+}
