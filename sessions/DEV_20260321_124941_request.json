@@ -1,0 +1,8 @@
+{
+  "prompt": "Registrer leverandoren Levtest AS med organisasjonsnummer 987654321. E-post: faktura@levtest.no.",
+  "files": [],
+  "tripletex_credentials": {
+    "base_url": "https://kkpqfuj-amager.tripletex.dev/v2",
+    "session_token": "eyJ0b2tlbklkIjoyMTQ3NjI4NDgyLCJ0b2tlbiI6IjBhYjc0Yjg1LWZiMDEtNGZkOC1hMWFiLWY5Nzk3MWZiYjA3NiJ9"
+  }
+}

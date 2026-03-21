@@ -1,0 +1,8 @@
+{
+  "prompt": "Führen Sie den vollständigen Projektzyklus für 'Cloud-Migration Brückentor' (Brückentor GmbH, Org.-Nr. 882854000) durch: 1) Das Projekt hat ein Budget von 262850 NOK. 2) Erfassen Sie Stunden: Lukas Hoffmann (Projektleiter, lukas.hoffmann@example.org) 37 Stunden und Tobias Meyer (Berater, tobias.meyer@example.org) 101 Stunden. 3) Erfassen Sie Lieferantenkosten von 89750 NOK von Sonnental GmbH (Org.-Nr. 930613118). 4) Erstellen Sie eine Kundenrechnung für das Projekt.",
+  "files": [],
+  "tripletex_credentials": {
+    "base_url": "https://tx-proxy-jwanbnu3pq-lz.a.run.app/v2",
+    "session_token": "9TIW6x6vAchl7nVR5FjTOXCR7npvbn4ZCYaiqvsLGDw"
+  }
+}

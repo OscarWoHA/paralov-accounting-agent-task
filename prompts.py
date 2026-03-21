@@ -27,6 +27,7 @@ NEVER set "id" on new objects. PUT /:action endpoints use QUERY PARAMS.
 /token/session, /timesheet/entry, /activity, /currency, /bank
 
 ## Field Names (use EXACT names in ?fields=)
+To find a ledger account by number: GET /ledger/account?number=6500&fields=id,number,name (use "number" param, NOT "numberFrom"/"numberTo"!)
 customer: id,name,organizationNumber,email,phoneNumber,postalAddress,isCustomer,isSupplier,isPrivateIndividual
 supplier: id,name,organizationNumber,email,phoneNumber,isSupplier,postalAddress
 employee: id,firstName,lastName,email,dateOfBirth,phoneNumberMobile,userType,allowInformationRegistration,department
@@ -82,14 +83,18 @@ PUT /invoice/{{id}}/:createReminder?type=REMINDER&date={today}&dispatchType=EMAI
 
 ## Travel Expenses
 POST /travelExpense: {{"employee":{{"id":ID}},"title":"X","travelDetails":{{"isForeignTravel":false,"isDayTrip":false,"departureDate":"YYYY-MM-DD","returnDate":"YYYY-MM-DD","departureFrom":"Oslo","destination":"City","departureTime":"08:00","returnTime":"17:00","purpose":"X"}},"costs":[{{"paymentType":{{"id":PT}},"costCategory":{{"id":CC}},"date":"YYYY-MM-DD","amountCurrencyIncVat":N,"comments":"X"}}]}}
-Per diem: find rate via GET /travelExpense/rateCategory?type=PER_DIEM&fields=id,name,fromDate,toDate (2026 innland "Overnatting over 12 timer"), then GET /travelExpense/rate?rateCategoryId=CAT_ID&fields=id,rate to get RATE ID (NOT category ID!).
+Per diem: GET /travelExpense/rateCategory?type=PER_DIEM&fromDate=2026-01-01&toDate=2026-12-31&fields=id,name,fromDate,toDate&count=200 -> find "Overnatting over 12 timer" (innland). Then GET /travelExpense/rate?rateCategoryId=CAT_ID&fields=id,rate to get RATE ID (NOT category ID!).
 POST /travelExpense/perDiemCompensation: {{"travelExpense":{{"id":ID}},"rateType":{{"id":RATE_ID}},"location":"City","count":N,"rate":800,"overnightAccommodation":"HOTEL"}}
 Deliver: PUT /travelExpense/:deliver?id=ID (1 attempt, skip if fails)
 DELETE /travelExpense/{{id}} -> 204
 
 ## Projects
 POST /project: {{"name":"X","projectManager":{{"id":EMP}},"customer":{{"id":CID}},"startDate":"{today}","isFixedPrice":true,"fixedprice":N}}
+INTERNAL projects ("internt"/"interne"/"internal"): set isInternal:true, no customer needed.
 PM needs entitlements 45+10. For project invoicing add "project":{{"id":PID}} on order.
+Milestone invoicing: PUT /project/{{id}} to update fixedprice, then POST /invoice with orderLine amount = fixedprice × percentage.
+POST /activity: {{"name":"X","activityType":"PROJECT_GENERAL_ACTIVITY","isProjectActivity":true}} (activityType REQUIRED!)
+Link to project: POST /project/projectActivity {{"project":{{"id":PID}},"activity":{{"id":AID}}}}
 
 ## Departments & Dimensions
 POST /department: {{"name":"X","departmentNumber":N}} (GET existing first, use next number)
@@ -98,9 +103,11 @@ POST /ledger/accountingDimensionValue: {{"displayName":"X","dimensionIndex":N}}
 Voucher link: "freeAccountingDimension1":{{"id":VAL_ID}} on posting (matches dimensionIndex)
 
 ## Vouchers & Corrections
-POST /ledger/voucher: {{"date":"{today}","description":"X","voucherType":{{"id":VT}},"postings":[{{"row":1,"date":"{today}","account":{{"id":ACC}},"amountGross":N,"amountGrossCurrency":N,"vatType":{{"id":1}},"supplier":{{"id":S}}}},{{"row":2,"date":"{today}","account":{{"id":ACC2}},"amountGross":-N,"amountGrossCurrency":-N}}]}}
+POST /ledger/voucher: {{"date":"{today}","description":"X","voucherType":{{"id":VT}},"postings":[{{"row":1,"date":"{today}","account":{{"id":EXPENSE_ACC}},"amountGross":N,"amountGrossCurrency":N,"vatType":{{"id":1}}}},{{"row":2,"date":"{today}","account":{{"id":ACC_2400}},"amountGross":-N,"amountGrossCurrency":-N,"supplier":{{"id":S}}}}]}}
+NOTE: supplier ref goes on the PAYABLE row (2400), NOT the expense row! Always use sendToCustomer=true for invoices.
 PUT /ledger/voucher/{{id}}/:reverse?date={today} (date REQUIRED!)
-Ledger error tasks: GET /ledger/posting?dateFrom=X&dateTo=Y&accountNumberFrom=ACCT&accountNumberTo=ACCT&fields=id,amountGross,voucher(id,number,description) to search by account.
+Ledger error tasks: search postings by account number, find the error amount, reverse the voucher, create corrected one.
+Ledger analysis: GET /ledger/posting?dateFrom=X&dateTo=Y&accountNumberFrom=4000&accountNumberTo=7999&fields=id,account,amount,date&count=1000. Compare periods by adjusting date ranges. Do NOT paginate all accounts individually.
 
 ## Supplier Invoices
 POST /incomingInvoice?sendTo=ledger: {{"invoiceHeader":{{"vendorId":SUPP_ID,"invoiceDate":"{today}","dueDate":"DUE","invoiceAmount":TOTAL,"invoiceNumber":"INV-X","currencyId":1}},"orderLines":[{{"externalId":"line-1","row":1,"description":"X","accountId":ACCT_NUM,"amountInclVat":TOTAL,"vatTypeId":1}}]}}
@@ -108,11 +115,14 @@ Uses FLAT IDs (vendorId, accountId, vatTypeId). externalId REQUIRED. vatTypeId 1
 If 403: fall back to POST /ledger/voucher with voucherType "Leverandorfaktura".
 
 ## Salary
-POST /salary/transaction: {{"date":"{today}","year":2026,"month":3,"payslips":[{{"employee":{{"id":EMP}},"date":"{today}","year":2026,"month":3,"specifications":[{{"salaryType":{{"id":FASTLONN}},"rate":SALARY,"count":1,"amount":SALARY}}]}}]}}
-GET /salary/type?fields=id,number,name first (number "2000"=Fastlonn). If fails: POST /ledger/voucher with voucherType "Lonnsbilag", debit 5000, credit 2920.
+Preferred: POST /ledger/voucher with voucherType "Lonnsbilag" (GET /ledger/voucherType?name=Lønnsbilag&fields=id,name), debit 5000, credit 2920.
+Alternative: POST /salary/transaction: {{"date":"{today}","year":2026,"month":3,"payslips":[{{"employee":{{"id":EMP}},"date":"{today}","year":2026,"month":3,"specifications":[{{"salaryType":{{"id":FASTLONN}},"rate":SALARY,"count":1,"amount":SALARY}}]}}]}}
+GET /salary/type?fields=id,number,name first (number "2000"=Fastlonn).
 
 ## PDF Tasks
-Read attachments with the Read tool. Contract fields: Personnummer->nationalIdentityNumber, Bankkonto->bankAccountNumber, Avdeling->department (create if missing), Stillingskode->occupationCode:{{"id":CODE}}, Stillingsprosent->percentageOfFullTimeEquivalent, Arslonn->annualSalary, Tiltredelse->startDate.
+Read attachments with the Read tool. Extract ALL fields from the PDF — do not skip any!
+Contract fields: Personnummer->nationalIdentityNumber, Bankkonto->bankAccountNumber, E-post->email, Avdeling->department (create if missing), Stillingskode->occupationCode:{{"id":CODE}}, Stillingsprosent->percentageOfFullTimeEquivalent, Arslonn->annualSalary, Tiltredelse->startDate, Arbeidstid->shiftDurationHours on employment details.
+Standard working hours: GET /salary/settings/standardTime (shows hoursPerDay). shiftDurationHours on employment details for the employee's specific hours.
 
 ## Efficiency
 Only Tripletex API calls are scored. Plan calls BEFORE starting. 1 retry max on errors. Skip VAT/bank for non-invoice tasks.
