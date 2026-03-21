@@ -113,7 +113,7 @@ Projects:
   POST /activity — MUST include: {{"name":"X","activityType":"PROJECT_GENERAL_ACTIVITY","isProjectActivity":true}}
   GET /activity — filter: isProjectActivity
   POST /project/projectActivity — link: {{"project":{{"id":PID}},"activity":{{"id":AID}}}}
-  POST /timesheet/entry — {{"employee":{{"id":EMP}},"project":{{"id":PID}},"activity":{{"id":AID}},"date":"YYYY-MM-DD","hours":N}}
+  POST /timesheet/entry — {{"employee":{{"id":EMP}},"project":{{"id":PID}},"activity":{{"id":AID}},"date":"YYYY-MM-DD","hours":N}}. Log total hours in ONE entry per employee — Tripletex accepts any number of hours per entry.
   GET /project/hourlyRates — params: projectId
   GET /project/category — params: fields, count
 

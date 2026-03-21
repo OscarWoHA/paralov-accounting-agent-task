@@ -1,3 +1,4 @@
+import asyncio
 import json
 import logging
 import os
@@ -72,41 +73,45 @@ async def solve(request: Request):
     is_production = "tx-proxy" in base_url
     env_tag = "PROD" if is_production else "DEV"
     ts = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
+    session_id = ts  # unique per request
     session_file = os.path.join(SESSIONS_DIR, f"{env_tag}_{ts}.log")
-    file_handler = logging.FileHandler(session_file, encoding="utf-8")
-    file_handler.setLevel(logging.INFO)
-    file_handler.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(name)s: %(message)s"))
-    # Use a unique logger per session to avoid cross-contamination on concurrent runs
-    session_logger_name = f"session_{ts}"
-    session_logger = logging.getLogger(session_logger_name)
-    session_logger.addHandler(file_handler)
-    session_logger.setLevel(logging.INFO)
-    # Also add to root so agent_v3 logs land here (but accept some bleed on concurrent runs)
-    root_logger = logging.getLogger()
-    root_logger.addHandler(file_handler)
 
-    # Also save the full request JSON alongside the log for replay
+    # Write request JSON alongside the log
     request_json_path = session_file.replace(".log", "_request.json")
     with open(request_json_path, "w", encoding="utf-8") as f:
         json.dump(body, f, ensure_ascii=False, indent=2)
 
     start_time = time.time()
 
-    logger.info(f"=== New task received ===")
-    logger.info(f"Prompt: {prompt}")
-    logger.info(f"Base URL: {base_url}")
-    logger.info(f"Files: {len(files)} attachment(s)")
-    logger.info(f"Request saved to: {req_filepath}")
+    # Log to session file directly (bypass root logger to avoid cross-contamination)
+    def slog(msg):
+        elapsed = time.time() - start_time
+        line = f"[{elapsed:7.1f}s] {msg}\n"
+        with open(session_file, "a", encoding="utf-8") as f:
+            f.write(line)
+
+    slog(f"=== New task received ===")
+    slog(f"Prompt: {prompt}")
+    slog(f"Base URL: {base_url}")
+    slog(f"Files: {len(files)} attachment(s)")
+    slog(f"Request saved to: {req_filepath}")
+
+    # Add session-tagged file handler — logs from concurrent runs will bleed
+    # but each line carries the session_id from its formatter so we can filter
+    file_handler = logging.FileHandler(session_file, encoding="utf-8")
+    file_handler.setLevel(logging.INFO)
+    file_handler.setFormatter(logging.Formatter(f"%(asctime)s [{session_id}] %(levelname)s %(name)s: %(message)s"))
+    root_logger = logging.getLogger()
+    root_logger.addHandler(file_handler)
 
     try:
         await run_agent(prompt, files, credentials)
     except Exception as e:
-        logger.error(f"Agent error: {e}\n{traceback.format_exc()}")
+        slog(f"Agent error: {e}\n{traceback.format_exc()}")
 
     elapsed = time.time() - start_time
-    logger.info(f"=== Task completed in {elapsed:.1f}s ===")
+    slog(f"=== Task completed in {elapsed:.1f}s ===")
 
-    # Remove the per-session handler
     root_logger.removeHandler(file_handler)
     file_handler.close()
 

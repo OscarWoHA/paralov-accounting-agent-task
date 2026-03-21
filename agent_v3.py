@@ -8,7 +8,7 @@ import tempfile
 
 import claude_code_sdk._internal.message_parser as _mp
 import claude_code_sdk._internal.client as _client
-from claude_code_sdk import query, ClaudeCodeOptions
+from claude_code_sdk import ClaudeSDKClient, ClaudeCodeOptions
 from claude_code_sdk.types import (
     AssistantMessage,
     ResultMessage,
@@ -60,8 +60,8 @@ def build_agent_prompt(prompt: str, files: list) -> str:
 
 
 async def run_agent(prompt: str, files: list, credentials: dict) -> None:
-    """Run the Claude Code SDK agent to complete an accounting task."""
-    logger.info(f"Starting agent v2 for task: {prompt[:150]}...")
+    """Run an isolated Claude Code SDK client per request."""
+    logger.info(f"Starting agent for task: {prompt[:150]}...")
 
     work_dir = tempfile.mkdtemp(prefix="tripletex_")
 
@@ -121,32 +121,36 @@ async def run_agent(prompt: str, files: list, credentials: dict) -> None:
             permission_mode="bypassPermissions",
         )
 
+        # Each request gets its own ClaudeSDKClient — fully isolated subprocess
         async with asyncio.timeout(AGENT_TIMEOUT):
-            async for message in query(prompt=agent_prompt, options=options):
-                if isinstance(message, AssistantMessage):
-                    for block in message.content:
-                        if hasattr(block, "text"):
-                            logger.info(f"Agent: {block.text}")
-                        elif hasattr(block, "name") and hasattr(block, "input"):
-                            input_str = json.dumps(block.input, ensure_ascii=False)
-                            logger.info(f"Agent tool: {block.name} → {input_str}")
-                        elif hasattr(block, "tool_use_id"):
-                            content = str(block.content) if block.content else ""
-                            logger.info(f"Tool result: {content}")
-                elif isinstance(message, UserMessage):
-                    if hasattr(message, "content") and isinstance(message.content, list):
+            client = ClaudeSDKClient(options)
+            async with client:
+                await client.query(prompt=agent_prompt)
+                async for message in client.receive_response():
+                    if isinstance(message, AssistantMessage):
                         for block in message.content:
-                            if hasattr(block, "tool_use_id"):
+                            if hasattr(block, "text"):
+                                logger.info(f"Agent: {block.text}")
+                            elif hasattr(block, "name") and hasattr(block, "input"):
+                                input_str = json.dumps(block.input, ensure_ascii=False)
+                                logger.info(f"Agent tool: {block.name} → {input_str}")
+                            elif hasattr(block, "tool_use_id"):
                                 content = str(block.content) if block.content else ""
                                 logger.info(f"Tool result: {content}")
-                elif isinstance(message, ResultMessage):
-                    logger.info(
-                        f"Agent finished: turns={message.num_turns}, "
-                        f"duration={message.duration_ms}ms, "
-                        f"error={message.is_error}"
-                    )
-                    if message.is_error:
-                        logger.error(f"Agent error result: {message.result}")
+                    elif isinstance(message, UserMessage):
+                        if hasattr(message, "content") and isinstance(message.content, list):
+                            for block in message.content:
+                                if hasattr(block, "tool_use_id"):
+                                    content = str(block.content) if block.content else ""
+                                    logger.info(f"Tool result: {content}")
+                    elif isinstance(message, ResultMessage):
+                        logger.info(
+                            f"Agent finished: turns={message.num_turns}, "
+                            f"duration={message.duration_ms}ms, "
+                            f"error={message.is_error}"
+                        )
+                        if message.is_error:
+                            logger.error(f"Agent error result: {message.result}")
 
     except TimeoutError:
         logger.warning(f"Agent timed out after {AGENT_TIMEOUT}s")
