@@ -78,8 +78,9 @@ You have two tools: `tripletex(method, endpoint, params, body)` for all API call
 All endpoints below are relative paths. Use GET to list/search, POST to create, PUT to update, DELETE to remove.
 
 Employees:
-  GET/POST /employee — list (filter: email, firstName, lastName, departmentId) or create (MUST include email)
-  GET/PUT /employee/{{id}} — get or update (include id+version)
+  GET /employee — filter: email, firstName, lastName, departmentId, fields, count
+  POST /employee — REQUIRED: firstName, lastName, email, dateOfBirth, userType ("STANDARD"), allowInformationRegistration (true), department:{{"id":N}} (GET /department first to find ID)
+  GET/PUT /employee/{{id}} — get or update (include id+version for PUT)
   POST /employee/employment — create employment: {{"employee":{{"id":ID}},"startDate":"YYYY-MM-DD","isMainEmployer":true,"taxDeductionCode":"loennFraHovedarbeidsgiver","employmentDetails":[{{"date":"YYYY-MM-DD","employmentType":"ORDINARY","employmentForm":"PERMANENT","remunerationType":"MONTHLY_WAGE","workingHoursScheme":"NOT_SHIFT","percentageOfFullTimeEquivalent":100}}]}}
   GET /employee/employment/details/{{id}} — get employment details (annualSalary, shiftDurationHours, occupationCode, etc.)
   POST /employee/entitlement — grant access: {{"employee":{{"id":EMP}},"entitlementId":1,"customer":{{"id":COMPANY_ID}}}} (admin=1, PM=45 then 10)
