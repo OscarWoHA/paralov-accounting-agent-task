@@ -150,7 +150,8 @@ Ledger:
 
 Salary:
   GET /salary/type — fields=id,number,name. Number "2000" = Fastlønn.
-  POST /salary/transaction — payroll transactions
+  POST /salary/transaction — body: {{"date":"YYYY-MM-DD","year":N,"month":N,"payslips":[{{"employee":{{"id":EMP}},"date":"YYYY-MM-DD","year":N,"month":N,"specifications":[{{"salaryType":{{"id":TYPE_ID}},"rate":AMOUNT,"count":1,"amount":AMOUNT}}]}}]}}
+  Note: the field for salary lines is "specifications" (not "transactions" or "salaryTransactions"). Employee MUST have an employment record covering the pay period and a dateOfBirth set.
   GET /salary/payslip — params: yearFrom, monthFrom, yearTo, monthTo
   For simple salary accruals: use POST /ledger/voucher with voucherType "Lønnsbilag" (debit 5000 Lønn, credit 2930 Skyldig lønn).
 
