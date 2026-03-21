@@ -41,6 +41,7 @@ SHOULD DO
 - GET /invoice requires invoiceDateFrom + invoiceDateTo params.
 - VAT on invoice order lines: "excluding" → unitPriceExcludingVatCurrency + vatType 3 + isPrioritizeAmountsIncludingVat:false. "including" → unitPriceIncludingVatCurrency + vatType 3 + isPrioritizeAmountsIncludingVat:true. "exempt" → vatType 5.
 - Voucher postings with deductible expenses: use vatType 1 (input VAT 25%) on the expense row if the account allows it.
+- Always verify VAT arithmetic: net × 1.25 should equal the total. If rounding differs, post exact amounts from the source document using manual rows (expense net, VAT on 2710, payable total) rather than relying on auto-calculation.
 - For bank reconciliation: match CSV lines to existing invoices by customer name and amount, pay them with the invoicing tool, then post remaining items (fees, tax, interest) as separate vouchers.
 - For ledger corrections: the task tells you exactly what the errors are — trust it. Fetch postings for the relevant accounts in ONE batched call to find the voucher IDs, then immediately reverse all error vouchers AND post all corrected vouchers in the same turn. Minimize thinking between calls — the task already contains the analysis.
 - For month-end/year-end: calculate all amounts upfront in the plan phase, then post all vouchers in rapid succession. Depreciation = acquisition cost / (useful life in years × 12) per month.
@@ -90,8 +91,9 @@ Employees:
 
 Customers & Suppliers:
   GET/POST /customer — filter: name, organizationNumber, email, customerNumber
-  GET/POST /supplier — filter: name, organizationNumber, supplierNumber
+  GET/POST /supplier — filter: name, organizationNumber, supplierNumber. Body: {{"name":"X","isSupplier":true}}. Optional: organizationNumber, email, postalAddress
   GET/PUT /customer/{{id}} or /supplier/{{id}} — include id+version for PUT
+  Address fields are "postalAddress", "physicalAddress", "deliveryAddress": {{"addressLine1":"X","postalCode":"Y","city":"Z"}}
   GET/POST /contact — filter: customerId, email
 
 Products & Departments:
@@ -138,9 +140,7 @@ Ledger:
   GET /ledger/voucherType — fields=id,name
   POST /ledger/voucher — {{"date":"YYYY-MM-DD","description":"X","voucherType":{{"id":VT}},"postings":[{{"row":1,"date":"YYYY-MM-DD","account":{{"id":ACC}},"amountGross":N,"amountGrossCurrency":N}},{{"row":2,...}}]}}
     For supplier invoices with VAT: set amountGross = total INCL VAT on the expense row with vatType:{{"id":1}} (input 25%). Tripletex auto-splits into net + VAT. The payable (2400) row: negative total incl VAT, NO vatType, supplier:{{"id":S}}.
-    IMPORTANT: If the invoice shows both net and total, verify: net × 1.25 = total. If there's a rounding difference, use the NET amount as amountGross instead (without vatType), and add a separate VAT row on account 2710 for the exact VAT amount. This avoids rounding errors.
     For non-VAT vouchers (salary, depreciation): omit vatType on all postings.
-    Supplier address field is "postalAddress" (not "address"): {{"postalAddress":{{"addressLine1":"X","postalCode":"Y","city":"Z"}}}}
   PUT /ledger/voucher/{{id}}/:reverse — params: date (required)
   DELETE /ledger/voucher/{{id}}
   GET /ledger/posting — REQUIRES dateFrom + dateTo. Also: accountNumberFrom/To, supplierId, customerId, employeeId, projectId
