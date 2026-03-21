@@ -137,8 +137,10 @@ Ledger:
   PUT /ledger/account/{{id}} — include id+version
   GET /ledger/voucherType — fields=id,name
   POST /ledger/voucher — {{"date":"YYYY-MM-DD","description":"X","voucherType":{{"id":VT}},"postings":[{{"row":1,"date":"YYYY-MM-DD","account":{{"id":ACC}},"amountGross":N,"amountGrossCurrency":N}},{{"row":2,...}}]}}
-    For supplier invoices with VAT: amountGross = total INCL VAT on expense row + vatType:{{"id":1}}. Payable (2400) row: negative total, NO vatType, supplier:{{"id":S}}.
+    For supplier invoices with VAT: set amountGross = total INCL VAT on the expense row with vatType:{{"id":1}} (input 25%). Tripletex auto-splits into net + VAT. The payable (2400) row: negative total incl VAT, NO vatType, supplier:{{"id":S}}.
+    IMPORTANT: If the invoice shows both net and total, verify: net × 1.25 = total. If there's a rounding difference, use the NET amount as amountGross instead (without vatType), and add a separate VAT row on account 2710 for the exact VAT amount. This avoids rounding errors.
     For non-VAT vouchers (salary, depreciation): omit vatType on all postings.
+    Supplier address field is "postalAddress" (not "address"): {{"postalAddress":{{"addressLine1":"X","postalCode":"Y","city":"Z"}}}}
   PUT /ledger/voucher/{{id}}/:reverse — params: date (required)
   DELETE /ledger/voucher/{{id}}
   GET /ledger/posting — REQUIRES dateFrom + dateTo. Also: accountNumberFrom/To, supplierId, customerId, employeeId, projectId
