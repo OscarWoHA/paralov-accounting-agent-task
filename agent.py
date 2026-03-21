@@ -47,8 +47,8 @@ def build_agent_prompt(prompt: str, files: list) -> str:
     """Build the prompt for Claude Code including the task and file info."""
     parts = [
         f"Execute this Tripletex accounting task:\n\n{prompt}\n",
-        "You have the `mcp__tripletex__api_call` tool available. Use it to make API calls.",
-        "Do NOT use Bash, Read, Write, or any other tool. Only use `mcp__tripletex__api_call`.",
+        "You have the `mcp__tripletex__api_call` tool available for API calls, and `Read` for reading file attachments (PDFs, images).",
+        "Do NOT use Bash, Write, or any other tool. Only use `mcp__tripletex__api_call` and `Read`.",
         "",
         "BRIEFLY plan (max 3 lines), then IMMEDIATELY start making API calls. Be fast — time is limited!",
         "Key decisions: CREATE or GET? VAT or no VAT? Which entities are referenced?",
@@ -76,6 +76,7 @@ async def run_agent(prompt: str, files: list, credentials: dict) -> None:
         for f in files:
             filename = f.get("filename", "attachment")
             filepath = os.path.join(work_dir, filename)
+            os.makedirs(os.path.dirname(filepath), exist_ok=True)
             data = base64.b64decode(f["content_base64"])
             with open(filepath, "wb") as fh:
                 fh.write(data)
@@ -87,7 +88,7 @@ async def run_agent(prompt: str, files: list, credentials: dict) -> None:
             append_system_prompt=get_system_prompt(),
             model="sonnet",
             continue_conversation=False,
-            allowed_tools=["mcp__tripletex__api_call", "ToolSearch"],
+            allowed_tools=["mcp__tripletex__api_call", "ToolSearch", "Read"],
             mcp_servers={
                 "tripletex": McpStdioServerConfig(
                     command="python",
