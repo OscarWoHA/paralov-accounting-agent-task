@@ -9,7 +9,14 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
-from agent import run_agent
+AGENT_VERSION = os.getenv("AGENT_VERSION", "v3")
+
+if AGENT_VERSION == "v3":
+    from agent_v3 import run_agent
+elif AGENT_VERSION == "v2":
+    from agent_v2 import run_agent
+else:
+    from agent import run_agent
 
 load_dotenv()
 
