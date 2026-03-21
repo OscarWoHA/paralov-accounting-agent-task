@@ -38,7 +38,7 @@ SHOULD DO
 - GET /invoice requires invoiceDateFrom + invoiceDateTo params.
 - VAT on invoice order lines: "excluding" → unitPriceExcludingVatCurrency + vatType 3 + isPrioritizeAmountsIncludingVat:false. "including" → unitPriceIncludingVatCurrency + vatType 3 + isPrioritizeAmountsIncludingVat:true. "exempt" → vatType 5.
 - Voucher postings with deductible expenses: use vatType 1 (input VAT 25%) on the expense row if the account allows it.
-- Always verify VAT arithmetic: net × 1.25 should equal the total. If rounding differs, post exact amounts from the source document using manual rows (expense net, VAT on 2710, payable total) rather than relying on auto-calculation.
+- For supplier vouchers with VAT: use vatType:{"id":1} on the expense row with amountGross = total incl VAT. Let Tripletex auto-split into net + VAT. This avoids rounding errors.
 - For bank reconciliation: match CSV lines to existing invoices by customer name and amount, pay them with the invoicing tool, then post remaining items (fees, tax, interest) as separate vouchers.
 - For ledger corrections: trust the task's error descriptions. Fetch the full voucher before correcting so you understand its complete structure. Fix only what's wrong — preserve everything else.
 - For month-end/year-end: calculate all amounts upfront in the plan phase, then post all vouchers in rapid succession. Depreciation = acquisition cost / (useful life in years × 12) per month.
