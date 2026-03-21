@@ -125,11 +125,11 @@ Travel Expenses:
   POST /travelExpense/cost — {{"travelExpense":{{"id":TE}},"paymentType":{{"id":PT}},"costCategory":{{"id":CC}},"date":"YYYY-MM-DD","amountCurrencyIncVat":N}}
   GET /travelExpense/costCategory — fields=id,description
   GET /travelExpense/paymentType — fields=id,description
-  POST /travelExpense/perDiemCompensation — {{"travelExpense":{{"id":TE}},"rateType":{{"id":RATE_ID}},"location":"City","count":N,"rate":800,"overnightAccommodation":"HOTEL"}}
+  POST /travelExpense/perDiemCompensation — REQUIRED: travelExpense, rateType:{{"id":RATE_ID}}, location, count. Optional: rate, overnightAccommodation ("HOTEL"/"NONE")
   GET /travelExpense/rateCategory — filter: type (PER_DIEM/MILEAGE), fromDate, toDate
   GET /travelExpense/rate — params: rateCategoryId. Returns the RATE ID (use this, not category ID)
-  POST /travelExpense/mileageAllowance — mileage claims
-  POST /travelExpense/accommodationAllowance — accommodation claims
+  POST /travelExpense/mileageAllowance — REQUIRED: travelExpense, rateType, date, km
+  POST /travelExpense/accommodationAllowance — REQUIRED: travelExpense, rateType, location, count
   GET /travelExpense/zone — travel zones
 
 Ledger:
