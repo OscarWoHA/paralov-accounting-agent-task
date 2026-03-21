@@ -19,21 +19,17 @@ Say DONE when complete.
 MUST DO
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-1. Batch all independent tool calls into the same turn. Look up ALL accounts, entities, and reference data you'll need in your FIRST batch of calls — before you start any write operations.
+1. Batch all independent tool calls into the same turn. Look up ALL accounts, entities, and reference data you'll need in your FIRST batch — before any write operations.
 2. For ANY task involving invoices: call setup(action="ensure_bank_account") FIRST.
 3. "Create X" → POST directly. "Invoice for customer X" / "delete" / "reverse" / "credit" → GET first, entity exists.
-4. Read PDF/image attachments with the Read tool. Extract ALL fields.
-5. Verify extracted data with professional judgment. PDFs are source documents — account numbers on invoices/receipts may be wrong. Map expenses to the correct NS 4102 account based on the nature of the expense (e.g. "Skylagring"/"cloud storage" → 6810 Datakostnad, "Kontortjenester" → 6790 Annen fremmed tjeneste).
-6. Trust the task prompt — account numbers, amounts, and error descriptions are correct. Act on them directly without re-verifying. However, if an account number doesn't exist in Tripletex, use the NS 4102 chart above to find the nearest correct equivalent.
-7. Dates: "YYYY-MM-DD". References: {{"id": N}}. Today: {today}.
-8. Use ?fields=id,name,... to request only needed fields. Nested fields use parentheses: account(number,name).
-9. Find ledger accounts by exact number search or the reference table below.
-10. Complete EVERY part of the task — never skip any step. If a salary amount is unspecified, use a reasonable estimate and proceed.
-11. Account for EVERY line item in bank statements, receipts, or financial documents — fees, tax deductions, interest, rounding.
-12. For supplier costs: create or find the supplier entity first, then create a ledger voucher with voucherType "Leverandørfaktura". Place supplier ref on the account 2400 (payable) row.
-13. For invoice order lines: use OUTPUT VAT codes (3=25%, 5=exempt, 31=15%, 32=12%).
-15. When a task involves both a project and an invoice, always link them: add "project":{{"id":PROJECT_ID}} on the order object in the invoice body.
-14. Prepaid expense accounts map to their corresponding expense: 1700 Forskuddsbetalt leie → 6300 Leie lokale, 1710 Forskuddsbetalt rente → 8150 Rentekostnad, 1742 Forskuddsbetalt forsikring → 7500 Forsikring.
+4. Read PDF/image attachments with the Read tool. Extract ALL fields. Verify with professional judgment — map expenses to correct NS 4102 accounts by nature of expense.
+5. Trust the task prompt — account numbers, amounts, and errors are correct. Act directly. If an account doesn't exist, use the chart below for the nearest equivalent.
+6. Complete EVERY part of the task — never skip any step. Account for EVERY line item in documents.
+7. Dates: "YYYY-MM-DD". References: {{"id": N}}. Today: {today}. Nested fields: use parentheses account(number,name).
+8. When creating invoices for a project: add "project":{{"id":PROJECT_ID}} on the order object.
+9. For supplier costs: create/find supplier first, then ledger voucher with voucherType "Leverandørfaktura". Supplier ref on account 2400 row.
+10. For invoice order lines: use OUTPUT VAT codes (3=25%, 5=exempt, 31=15%, 32=12%).
+11. Prepaid accounts → corresponding expense: 1700→6300, 1710→8150, 1742→7500.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 SHOULD DO
@@ -112,7 +108,7 @@ Invoicing:
   GET /order/orderline — filter: orderId
 
 Projects:
-  GET/POST /project — filter: name, customerId, projectManagerId, isClosed, isInternal. Budget field is called "fixedprice" (not "budget")
+  GET/POST /project — filter: name, customerId, projectManagerId, isClosed, isInternal. For fixed-price projects: set BOTH "isFixedPrice":true AND "fixedprice":N together (not "budget")
   PUT /project/{{id}} — include id+version
   POST /activity — MUST include: {{"name":"X","activityType":"PROJECT_GENERAL_ACTIVITY","isProjectActivity":true}}
   GET /activity — filter: isProjectActivity

@@ -126,18 +126,18 @@ async def run_agent(prompt: str, files: list, credentials: dict) -> None:
                 if isinstance(message, AssistantMessage):
                     for block in message.content:
                         if hasattr(block, "text"):
-                            logger.info(f"Agent: {block.text[:300]}")
+                            logger.info(f"Agent: {block.text}")
                         elif hasattr(block, "name") and hasattr(block, "input"):
-                            input_str = json.dumps(block.input, ensure_ascii=False)[:500]
+                            input_str = json.dumps(block.input, ensure_ascii=False)
                             logger.info(f"Agent tool: {block.name} → {input_str}")
                         elif hasattr(block, "tool_use_id"):
-                            content = str(block.content)[:2000] if block.content else ""
+                            content = str(block.content) if block.content else ""
                             logger.info(f"Tool result: {content}")
                 elif isinstance(message, UserMessage):
                     if hasattr(message, "content") and isinstance(message.content, list):
                         for block in message.content:
                             if hasattr(block, "tool_use_id"):
-                                content = str(block.content)[:2000] if block.content else ""
+                                content = str(block.content) if block.content else ""
                                 logger.info(f"Tool result: {content}")
                 elif isinstance(message, ResultMessage):
                     logger.info(
