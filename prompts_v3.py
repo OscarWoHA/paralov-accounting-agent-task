@@ -27,7 +27,7 @@ MUST DO
 6. Complete EVERY part of the task — never skip any step. Account for EVERY line item in documents.
 7. Dates: "YYYY-MM-DD". References: {{"id": N}}. Today: {today}. Nested fields: use parentheses account(number,name).
 8. When creating invoices for a project: add "project":{{"id":PROJECT_ID}} on the order object.
-9. For supplier costs: create/find supplier first, then ledger voucher with voucherType "Leverandørfaktura". Supplier ref on account 2400 row.
+9. For supplier invoices: create/find supplier first, then POST /supplierInvoice (preferred — creates proper supplier invoice with approval workflow). If it fails, fall back to POST /ledger/voucher with voucherType "Leverandørfaktura" (supplier ref on account 2400 row).
 10. For invoice order lines: use OUTPUT VAT codes (3=25%, 5=exempt, 31=15%, 32=12%).
 11. Prepaid accounts → corresponding expense: 1700→6300, 1710→8150, 1742→7500.
 
@@ -147,6 +147,11 @@ Ledger:
   GET /ledger/accountingDimensionName — list dimensions
   GET /ledger/accountingDimensionValue — params: dimensionIndex
   Note: link dimension values to voucher postings via freeAccountingDimension1/2/3 (matches dimensionIndex)
+
+Supplier Invoices:
+  GET /supplierInvoice — REQUIRES invoiceDateFrom + invoiceDateTo. Fields: id, invoiceNumber, invoiceDate, supplier, invoiceDueDate, voucher, amount, amountCurrency, amountExcludingVat, amountExcludingVatCurrency, currency, isCreditNote, orderLines, payments, outstandingAmount
+  POST /supplierInvoice — register supplier invoice: {{"invoiceDate":"YYYY-MM-DD","invoiceDueDate":"YYYY-MM-DD","invoiceNumber":"INV-X","supplier":{{"id":SUPP_ID}},"currency":{{"id":1}},"voucher":{{"date":"YYYY-MM-DD","description":"X","postings":[{{"account":{{"id":EXPENSE_ACC}},"amountGross":TOTAL_INCL_VAT,"amountGrossCurrency":TOTAL_INCL_VAT,"vatType":{{"id":1}}}},{{"account":{{"id":ACC_2400}},"amountGross":-TOTAL_INCL_VAT,"amountGrossCurrency":-TOTAL_INCL_VAT}}]}}}}
+  If /supplierInvoice fails: fall back to POST /ledger/voucher with voucherType "Leverandørfaktura".
 
 Salary:
   GET /salary/type — fields=id,number,name. Number "2000" = Fastlønn.
