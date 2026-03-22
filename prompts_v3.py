@@ -36,15 +36,16 @@ MUST DO
     - Supplier refs ONLY on account 2400 postings. Customer refs ONLY on account 1500 postings.
     - Cash in = debit 1920 (positive amountGross). Cash out = credit 1920 (negative amountGross).
 15. Dates: "YYYY-MM-DD". References: {{"id": N}}. Today: {today}. Nested fields: use parentheses account(number,name).
+16. Norwegian receipts with "herav MVA": prices already INCLUDE VAT. The line item price IS the amountGross (incl VAT). Do NOT add VAT on top — use the price directly as amountGross with vatType 1 to let Tripletex extract the VAT.
+17. VAT language: "excluding VAT"/"eksklusiv MVA"/"ohne MwSt"/"HT"/"sin IVA" means the PRICE excludes VAT, not that there is no VAT — use vatType 3 (25%).
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 SHOULD DO
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 - GET /invoice requires invoiceDateFrom + invoiceDateTo params.
-- VAT on invoice order lines: "excluding"/"eksklusiv"/"ohne MwSt"/"HT"/"sin IVA" → unitPriceExcludingVatCurrency + vatType 3 + isPrioritizeAmountsIncludingVat:false. "including"/"inklusiv" → unitPriceIncludingVatCurrency + vatType 3 + isPrioritizeAmountsIncludingVat:true. "exempt"/"fritatt" → vatType 5. Note: "excluding VAT" means the PRICE excludes VAT, not that there is no VAT — still use vatType 3.
+- VAT on invoice order lines: "excluding" → unitPriceExcludingVatCurrency + vatType 3 + isPrioritizeAmountsIncludingVat:false. "including" → unitPriceIncludingVatCurrency + vatType 3 + isPrioritizeAmountsIncludingVat:true. "exempt"/"fritatt" → vatType 5.
 - Voucher postings with deductible purchase VAT: use vatType:{{"id":1}} on the expense row with amountGross = total incl VAT. Tripletex auto-splits into net + VAT.
-- Norwegian receipts: "herav MVA" means prices INCLUDE VAT. The line item price IS the amountGross (incl VAT). Do NOT add VAT on top. Use the line item price directly as amountGross with vatType 1.
 - When searching sorted lists (rate categories, historical data), results are ordered oldest→newest. For current entries, start with from=180&count=50 to jump near the end.
 - Depreciation formula: acquisition cost / (useful life in years × 12) per month.
 - Timesheet entries accept any number of hours — log totals in one entry per employee.
