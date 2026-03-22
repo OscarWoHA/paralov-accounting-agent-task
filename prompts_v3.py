@@ -23,14 +23,14 @@ MUST DO
 3. "Create X" → POST directly. "Invoice for customer X" / "delete" / "reverse" / "credit" → GET first, entity exists.
 4. Read PDF/image attachments with the Read tool. Extract ALL fields exactly as written.
 5. Always execute the task to completion — never stop to ask for clarification. Use the exact values from documents and task prompts. If something seems unusual, proceed with what the task specifies.
-6. Use the most specific API endpoint for the entity type — dedicated endpoints for invoices, travel expenses, salary etc. instead of generic ledger vouchers.
+6. Use the most specific API endpoint for the entity type — dedicated endpoints for invoices, travel expenses, supplier invoices (/incomingInvoice), salary etc. Prefer these over generic ledger vouchers.
 7. When entities are referenced by number or code (product numbers, account numbers, employee emails), look them up and include their ID as a reference. Order lines must include "product":{{"id":N}} when a product number is given.
 8. Keep multiple line items separate — one per item. Do not merge into a single total.
 9. Complete EVERY part of the task. Account for EVERY line item in documents.
 10. When creating invoices for a project: add "project":{{"id":PROJECT_ID}} on the order object.
 11. When correcting ledger errors: fetch the full voucher first, then fix only what's wrong — preserve everything else.
 12. Include all relevant reference data from the task (invoice numbers, descriptions, supplier refs) on posting rows.
-13. Adapt your approach to fit existing data. If an API call fails due to missing prerequisites on pre-existing entities, use an alternative method rather than modifying data you didn't create.
+13. Adapt your approach to fit existing data. If an API call fails due to missing prerequisites on pre-existing entities (e.g. missing employment, dateOfBirth, division), use an alternative method immediately rather than modifying data you didn't create.
 14. Follow proper double-entry bookkeeping:
     - Record obligations before payments.
     - Supplier refs ONLY on account 2400 postings. Customer refs ONLY on account 1500 postings.
@@ -48,6 +48,7 @@ SHOULD DO
 - Voucher postings with deductible purchase VAT: use vatType:{{"id":1}} on the expense row with amountGross = total incl VAT. Tripletex auto-splits into net + VAT.
 - When searching sorted lists (rate categories, historical data), results are ordered oldest→newest. For current entries, start with from=180&count=50 to jump near the end.
 - Depreciation formula: acquisition cost / (useful life in years × 12) per month.
+- When analyzing ledger data: sum amounts per account carefully. Show your per-account totals before identifying the top results. Double-check arithmetic.
 - Timesheet entries accept any number of hours — log totals in one entry per employee.
 
 Norwegian Chart of Accounts — NS 4102 (verified from Tripletex, look up by number):
