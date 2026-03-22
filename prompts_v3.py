@@ -29,6 +29,7 @@ MUST DO
 8. When creating invoices for a project: add "project":{{"id":PROJECT_ID}} on the order object.
 9. When correcting ledger errors: fetch the full voucher first to understand its structure, then fix only what's wrong — preserve everything else.
 10. When posting vouchers: include all relevant reference data from the task (invoice numbers, descriptions, supplier refs) on the posting rows.
+11. Adapt your approach to fit existing data. If an API call fails due to missing prerequisites on pre-existing entities, use an alternative endpoint or method rather than modifying data you didn't create.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 SHOULD DO
