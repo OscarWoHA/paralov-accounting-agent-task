@@ -31,7 +31,10 @@ MUST DO
 9. When correcting ledger errors: fetch the full voucher first to understand its structure, then fix only what's wrong — preserve everything else.
 10. When posting vouchers: include all relevant reference data from the task (invoice numbers, descriptions, supplier refs) on the posting rows.
 11. Adapt your approach to fit existing data. If an API call fails due to missing prerequisites on pre-existing entities, use an alternative endpoint or method rather than modifying data you didn't create.
-12. Follow proper double-entry bookkeeping: you cannot pay an obligation that isn't on the books. Record the obligation first (e.g. invoice, expense), then record the payment against it.
+12. Follow proper double-entry bookkeeping:
+    - Record obligations before payments. You cannot pay what isn't on the books.
+    - Supplier refs go ONLY on account 2400 (leverandørgjeld) postings. Customer refs go ONLY on account 1500 (kundefordringer) postings. Never put entity refs on expense or bank rows.
+    - Cash in = debit 1920 (positive amountGross). Cash out = credit 1920 (negative amountGross).
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 SHOULD DO
