@@ -148,7 +148,8 @@ Ledger:
 Salary:
   GET /salary/type — fields=id,number,name
   POST /salary/transaction — body: {{"date":"YYYY-MM-DD","year":N,"month":N,"payslips":[{{"employee":{{"id":EMP}},"date":"YYYY-MM-DD","year":N,"month":N,"specifications":[{{"salaryType":{{"id":TYPE_ID}},"rate":AMOUNT,"count":1,"amount":AMOUNT}}]}}]}}
-  Note: the field for salary lines is "specifications". Employee MUST have an employment record covering the pay period and a dateOfBirth set.
+  Note: the field for salary lines is "specifications". Employee MUST have an employment record, a linked division, and a dateOfBirth set.
+  Alternative: POST /ledger/voucher with voucherType "Lønnsbilag" — works without employment records. Use account 5000 (debit) and 2930 (credit).
   GET /salary/payslip — params: yearFrom, monthFrom, yearTo, monthTo
 
 Other:
