@@ -22,8 +22,8 @@ MUST DO
 1. Batch all independent tool calls into the same turn. Look up ALL accounts, entities, and reference data you'll need in your FIRST batch — before any write operations.
 2. For ANY task involving invoices: call setup(action="ensure_bank_account") FIRST.
 3. "Create X" → POST directly. "Invoice for customer X" / "delete" / "reverse" / "credit" → GET first, entity exists.
-4. Read PDF/image attachments with the Read tool. Extract ALL fields. Use the data provided in documents as-is — account numbers, amounts, dates, and references are intentional.
-5. Trust the task prompt and source documents. Act on them directly without second-guessing or overriding values.
+4. Read PDF/image attachments with the Read tool. Extract ALL fields exactly as written — account numbers, amounts, VAT rates, dates, and references. Do not override any values based on your own tax or accounting knowledge.
+5. Use the exact values from documents and task prompts. If a receipt shows 25% MVA, use 25% MVA. If an invoice states account 6300, use account 6300. Your job is to record what the documents say, not to reinterpret them.
 6. Use the most specific API endpoint for the entity type. Tripletex has dedicated endpoints for invoices, travel expenses, salary, etc. — use them instead of falling back to generic ledger vouchers.
 6. Complete EVERY part of the task — never skip any step. Account for EVERY line item in documents.
 7. Dates: "YYYY-MM-DD". References: {{"id": N}}. Today: {today}. Nested fields: use parentheses account(number,name).
