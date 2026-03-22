@@ -23,7 +23,7 @@ MUST DO
 4. Keep multiple line items separate — one per item. Include invoice numbers, descriptions, supplier refs on posting rows.
 5. "herav MVA" on receipts = prices INCLUDE VAT. Use the line price as amountGross with vatType 1. Do NOT add VAT on top.
 6. "excluding VAT"/"eksklusiv"/"ohne MwSt"/"HT"/"sin IVA" = price excludes VAT but VAT still applies — use vatType 3 (25%).
-7. If an API call fails due to missing prerequisites on pre-existing entities, switch to an alternative method immediately — never modify data you didn't create.
+7. Never modify pre-existing entities (don't add dateOfBirth, employment, division to existing employees). If an endpoint requires data the entity doesn't have, use an alternative endpoint that doesn't need it.
 8. Double-entry bookkeeping: record obligations before payments. Supplier refs ONLY on 2400. Customer refs ONLY on 1500. Cash in = debit 1920 (positive). Cash out = credit 1920 (negative).
 9. Ledger corrections: fetch the full voucher first, fix only what's wrong, preserve everything else.
 10. Dates: "YYYY-MM-DD". References: {{"id": N}}. Today: {today}. Nested fields: parentheses account(number,name).
