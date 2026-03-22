@@ -22,7 +22,7 @@ MUST DO
 1. Batch all independent tool calls into the same turn. Look up ALL accounts, entities, and reference data you'll need in your FIRST batch — before any write operations.
 2. For ANY task involving invoices: call setup(action="ensure_bank_account") FIRST.
 3. "Create X" → POST directly. "Invoice for customer X" / "delete" / "reverse" / "credit" → GET first, entity exists.
-4. Read PDF/image attachments with the Read tool. Extract ALL fields. Verify with professional judgment — map expenses to correct NS 4102 accounts by nature of expense.
+4. Read PDF/image attachments with the Read tool. Extract ALL fields. Use the account numbers provided in documents — they are intentional.
 5. Trust the task prompt — account numbers, amounts, and errors are correct. Act directly. If an account doesn't exist, use the chart below for the nearest equivalent.
 6. Complete EVERY part of the task — never skip any step. Account for EVERY line item in documents.
 7. Dates: "YYYY-MM-DD". References: {{"id": N}}. Today: {today}. Nested fields: use parentheses account(number,name).
