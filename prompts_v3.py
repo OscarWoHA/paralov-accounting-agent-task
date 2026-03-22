@@ -27,9 +27,8 @@ MUST DO
 6. Complete EVERY part of the task — never skip any step. Account for EVERY line item in documents.
 7. Dates: "YYYY-MM-DD". References: {{"id": N}}. Today: {today}. Nested fields: use parentheses account(number,name).
 8. When creating invoices for a project: add "project":{{"id":PROJECT_ID}} on the order object.
-9. For supplier costs: create/find supplier first, then create a ledger voucher with voucherType "Leverandørfaktura". Place supplier ref on the account 2400 (payable) row.
-10. For invoice order lines: use OUTPUT VAT codes (3=25%, 5=exempt, 31=15%, 32=12%).
-11. Prepaid accounts → corresponding expense: 1700→6300, 1710→8150, 1742→7500.
+9. When correcting ledger errors: fetch the full voucher first to understand its structure, then fix only what's wrong — preserve everything else.
+10. When posting vouchers: include all relevant reference data from the task (invoice numbers, descriptions, supplier refs) on the posting rows.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 SHOULD DO
@@ -37,13 +36,10 @@ SHOULD DO
 
 - GET /invoice requires invoiceDateFrom + invoiceDateTo params.
 - VAT on invoice order lines: "excluding" → unitPriceExcludingVatCurrency + vatType 3 + isPrioritizeAmountsIncludingVat:false. "including" → unitPriceIncludingVatCurrency + vatType 3 + isPrioritizeAmountsIncludingVat:true. "exempt" → vatType 5.
-- Voucher postings with deductible expenses: use vatType 1 (input VAT 25%) on the expense row if the account allows it.
-- For supplier vouchers with VAT: use vatType:{"id":1} on the expense row with amountGross = total incl VAT. Let Tripletex auto-split into net + VAT. This avoids rounding errors.
-- For bank reconciliation: match CSV lines to existing invoices by customer name and amount, pay them with the invoicing tool, then post remaining items (fees, tax, interest) as separate vouchers.
-- For ledger corrections: trust the task's error descriptions. Fetch the full voucher before correcting so you understand its complete structure. Fix only what's wrong — preserve everything else.
-- For month-end/year-end: calculate all amounts upfront in the plan phase, then post all vouchers in rapid succession. Depreciation = acquisition cost / (useful life in years × 12) per month.
-- For salary accruals without a specified amount: estimate 40000-50000 NOK as monthly salary provision.
-- When searching sorted lists (rate categories, historical data), results are typically ordered oldest→newest. If you need current/recent entries, use a high `from` offset to skip to the end rather than paginating from the start. After finding a rate category, use its ID to look up the actual rate ID via the rates endpoint.
+- Voucher postings with deductible purchase VAT: use vatType:{{"id":1}} on the expense row with amountGross = total incl VAT. Tripletex auto-splits into net + VAT.
+- When searching sorted lists (rate categories, historical data), results are typically ordered oldest→newest. If you need current/recent entries, use a high `from` offset to skip to the end rather than paginating from the start.
+- Depreciation formula: acquisition cost / (useful life in years × 12) per month.
+- Timesheet entries accept any number of hours — log totals in one entry per employee, not split across days.
 
 Norwegian Chart of Accounts — NS 4102 (verified from Tripletex, look up by number):
   Assets: 1200 Maskiner og anlegg, 1240 Traktorer, 1250 Inventar, 1280 Kontormaskiner, 1500 Kundefordringer
@@ -103,7 +99,7 @@ Invoicing:
   PUT /invoice/{{id}}/:payment — params: paymentDate, paymentTypeId, paidAmount (incl VAT)
   PUT /invoice/{{id}}/:createCreditNote — params: date
   PUT /invoice/{{id}}/:createReminder — params: type=REMINDER, date, dispatchType=EMAIL
-  GET /invoice/paymentType — fields=id,description. Find "Betalt til bank"
+  GET /invoice/paymentType — fields=id,description
   GET /order — filter: customerId, orderDateFrom/To
   GET /order/orderline — filter: orderId
 
@@ -113,7 +109,7 @@ Projects:
   POST /activity — MUST include: {{"name":"X","activityType":"PROJECT_GENERAL_ACTIVITY","isProjectActivity":true}}
   GET /activity — filter: isProjectActivity
   POST /project/projectActivity — link: {{"project":{{"id":PID}},"activity":{{"id":AID}}}}
-  POST /timesheet/entry — {{"employee":{{"id":EMP}},"project":{{"id":PID}},"activity":{{"id":AID}},"date":"YYYY-MM-DD","hours":N}}. Log total hours in ONE entry per employee — Tripletex accepts any number of hours per entry.
+  POST /timesheet/entry — {{"employee":{{"id":EMP}},"project":{{"id":PID}},"activity":{{"id":AID}},"date":"YYYY-MM-DD","hours":N}}
   GET /project/hourlyRates — params: projectId
   GET /project/category — params: fields, count
 
@@ -136,13 +132,11 @@ Ledger:
   PUT /ledger/account/{{id}} — include id+version
   GET /ledger/voucherType — fields=id,name
   POST /ledger/voucher — {{"date":"YYYY-MM-DD","description":"X","voucherType":{{"id":VT}},"postings":[{{"row":1,"date":"YYYY-MM-DD","account":{{"id":ACC}},"amountGross":N,"amountGrossCurrency":N}},{{"row":2,...}}]}}
-    For supplier invoices with VAT: set amountGross = total INCL VAT on the expense row with vatType:{{"id":1}} (input 25%). Tripletex auto-splits into net + VAT. The payable (2400) row: negative total incl VAT, NO vatType, supplier:{{"id":S}}.
-    For supplier invoices: set "invoiceNumber":"INV-XXX" on EACH posting row to record the invoice reference.
-    For non-VAT vouchers (salary, depreciation): omit vatType on all postings.
+    Posting fields: account, amountGross, amountGrossCurrency, vatType, supplier, customer, employee, project, department, description, invoiceNumber, date, row
   PUT /ledger/voucher/{{id}}/:reverse — params: date (required)
   DELETE /ledger/voucher/{{id}}
   GET /ledger/posting — REQUIRES dateFrom + dateTo. Also: accountNumberFrom/To, supplierId, customerId, employeeId, projectId
-  GET /ledger/vatType — fields=id,name,number
+  GET /ledger/vatType — fields=id,name,number. OUTPUT codes for invoices: 3=25%, 5=exempt, 31=15%, 32=12%. INPUT code for purchases: 1=25%.
   POST /ledger/accountingDimensionName — {{"dimensionName":"X"}}. Returns dimensionIndex.
   POST /ledger/accountingDimensionValue — {{"displayName":"X","dimensionIndex":N}}
   GET /ledger/accountingDimensionName — list dimensions
@@ -150,15 +144,13 @@ Ledger:
   Note: link dimension values to voucher postings via freeAccountingDimension1/2/3 (matches dimensionIndex)
 
 Salary:
-  GET /salary/type — fields=id,number,name. Number "2000" = Fastlønn.
+  GET /salary/type — fields=id,number,name
   POST /salary/transaction — body: {{"date":"YYYY-MM-DD","year":N,"month":N,"payslips":[{{"employee":{{"id":EMP}},"date":"YYYY-MM-DD","year":N,"month":N,"specifications":[{{"salaryType":{{"id":TYPE_ID}},"rate":AMOUNT,"count":1,"amount":AMOUNT}}]}}]}}
-  Note: the field for salary lines is "specifications" (not "transactions" or "salaryTransactions"). Employee MUST have an employment record covering the pay period and a dateOfBirth set.
+  Note: the field for salary lines is "specifications". Employee MUST have an employment record covering the pay period and a dateOfBirth set.
   GET /salary/payslip — params: yearFrom, monthFrom, yearTo, monthTo
-  For simple salary accruals: use POST /ledger/voucher with voucherType "Lønnsbilag" (debit 5000 Lønn, credit 2930 Skyldig lønn).
 
 Other:
   GET /token/session/>whoAmI — company info (use setup tool instead)
   GET /currency — fields=id,code
   GET /company — fields=id,name,organizationNumber
 """
-
