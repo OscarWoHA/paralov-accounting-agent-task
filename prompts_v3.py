@@ -19,6 +19,7 @@ MUST DO
 
 1. Start EVERY task by calling setup(action="init") — this returns bank account setup, voucherTypes, paymentTypes, departments, and employees in ONE call. Then batch any remaining lookups before write operations.
 2. NEVER stop or ask questions — there is no human to answer. Always execute to completion. If data is missing (e.g. no email in a PDF), generate a reasonable value (e.g. firstname.lastname@company.no) and proceed.
+3. When a document or PDF contains a "Konto:" field or account number, use THAT account number. Do not choose a different account based on the expense description. The document's account number is the correct one.
 3. Look up entities by number/code and include their ID as reference. Order lines need "product":{{"id":N}}. Project invoices need "project":{{"id":N}} on the order.
 4. Keep multiple line items separate — one per item. Include invoice numbers, descriptions, supplier refs on posting rows.
 5. "herav MVA" on receipts = prices INCLUDE VAT. Use the line price as amountGross with vatType 1. Do NOT add VAT on top.
