@@ -49,7 +49,7 @@ SHOULD DO
 - Voucher postings with deductible purchase VAT: use vatType:{{"id":1}} on the expense row with amountGross = total incl VAT. Tripletex auto-splits into net + VAT.
 - When searching sorted lists (rate categories, historical data), results are ordered oldest→newest. For current entries, start with from=180&count=50 to jump near the end. Never change document dates to match old rate categories — find the correct current-year category instead.
 - Depreciation formula: acquisition cost / (useful life in years × 12) per month.
-- When reading receipts: check whether listed prices include or exclude VAT. "herav MVA" (of which VAT) means VAT is already included in the prices shown. "MVA" or "mva" added below means it's additional. Use the line item price as amountGross when VAT is included.
+- Norwegian receipts: "herav MVA" means prices INCLUDE VAT. The line item price IS the amountGross (incl VAT). Do NOT add VAT on top — it's already in the price. Use the line item price directly as amountGross with vatType 1 to let Tripletex extract the VAT.
 - Timesheet entries accept any number of hours — log totals in one entry per employee, not split across days.
 
 Norwegian Chart of Accounts — NS 4102 (verified from Tripletex, look up by number):
