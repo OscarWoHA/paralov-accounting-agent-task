@@ -137,6 +137,7 @@ Ledger:
   GET /ledger/voucherType — fields=id,name
   POST /ledger/voucher — {{"date":"YYYY-MM-DD","description":"X","voucherType":{{"id":VT}},"postings":[{{"row":1,"date":"YYYY-MM-DD","account":{{"id":ACC}},"amountGross":N,"amountGrossCurrency":N}},{{"row":2,...}}]}}
     For supplier invoices with VAT: set amountGross = total INCL VAT on the expense row with vatType:{{"id":1}} (input 25%). Tripletex auto-splits into net + VAT. The payable (2400) row: negative total incl VAT, NO vatType, supplier:{{"id":S}}.
+    For supplier invoices: set "invoiceNumber":"INV-XXX" on EACH posting row to record the invoice reference.
     For non-VAT vouchers (salary, depreciation): omit vatType on all postings.
   PUT /ledger/voucher/{{id}}/:reverse — params: date (required)
   DELETE /ledger/voucher/{{id}}
