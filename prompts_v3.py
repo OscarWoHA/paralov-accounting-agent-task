@@ -47,7 +47,7 @@ SHOULD DO
 - GET /invoice requires invoiceDateFrom + invoiceDateTo params.
 - VAT on invoice order lines: "excluding" → unitPriceExcludingVatCurrency + vatType 3 + isPrioritizeAmountsIncludingVat:false. "including" → unitPriceIncludingVatCurrency + vatType 3 + isPrioritizeAmountsIncludingVat:true. "exempt" → vatType 5.
 - Voucher postings with deductible purchase VAT: use vatType:{{"id":1}} on the expense row with amountGross = total incl VAT. Tripletex auto-splits into net + VAT.
-- When searching sorted lists (rate categories, historical data), results are typically ordered oldest→newest. If you need current/recent entries, use a high `from` offset to skip to the end rather than paginating from the start.
+- When searching sorted lists (rate categories, historical data), results are ordered oldest→newest. For current entries, start with from=180&count=50 to jump near the end. Never change document dates to match old rate categories — find the correct current-year category instead.
 - Depreciation formula: acquisition cost / (useful life in years × 12) per month.
 - Timesheet entries accept any number of hours — log totals in one entry per employee, not split across days.
 
