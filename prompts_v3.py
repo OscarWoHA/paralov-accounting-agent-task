@@ -141,6 +141,8 @@ Ledger:
   GET /ledger/account — params: number (exact), numberFrom/numberTo (range). Always search by exact number first.
   PUT /ledger/account/{{id}} — include id+version
   GET /ledger/voucherType — fields=id,name
+  POST /incomingInvoice?sendTo=ledger — register supplier invoices. Uses FLAT IDs (not refs). Body: {{"invoiceHeader":{{"vendorId":SUPPLIER_ID,"invoiceDate":"YYYY-MM-DD","dueDate":"YYYY-MM-DD","invoiceAmount":TOTAL_INCL_VAT,"invoiceNumber":"INV-X","currencyId":1}},"orderLines":[{{"externalId":"line-1","row":1,"description":"X","accountId":ACCOUNT_NUMBER,"amountInclVat":TOTAL_INCL_VAT,"vatTypeId":1}}]}}
+    Note: accountId is the account NUMBER (e.g. 6300), not the internal ID. externalId is REQUIRED. vatTypeId 1 = input VAT 25%. If this returns 403, fall back to /ledger/voucher.
   POST /ledger/voucher — {{"date":"YYYY-MM-DD","description":"X","voucherType":{{"id":VT}},"postings":[{{"row":1,"date":"YYYY-MM-DD","account":{{"id":ACC}},"amountGross":N,"amountGrossCurrency":N}},{{"row":2,...}}]}}
     Posting fields: account, amountGross, amountGrossCurrency, vatType, supplier, customer, employee, project, department, description, invoiceNumber, date, row
   PUT /ledger/voucher/{{id}}/:reverse — params: date (required)
