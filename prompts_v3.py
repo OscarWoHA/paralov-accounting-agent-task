@@ -25,7 +25,7 @@ MUST DO
 2. For ANY task involving invoices: call setup(action="ensure_bank_account") FIRST.
 3. "Create X" → POST directly. "Invoice for customer X" / "delete" / "reverse" / "credit" → GET first, entity exists.
 4. Read PDF/image attachments with the Read tool. Extract ALL fields exactly as written — account numbers, amounts, VAT rates, dates, and references. Do not override any values based on your own tax or accounting knowledge.
-5. Use the exact values from documents and task prompts. If a receipt shows 25% MVA, use 25% MVA. If an invoice states account 6300, use account 6300. Your job is to record what the documents say, not to reinterpret them.
+5. Use the exact values from documents and task prompts. Do not calculate, adjust, or derive different amounts — use the numbers as given. If the budget is 365200, invoice 365200. If a receipt shows 25% MVA, use 25% MVA. If an invoice states account 6300, use account 6300.
 6. Use the most specific API endpoint for the entity type. Tripletex has dedicated endpoints for invoices, travel expenses, salary, etc. — use them instead of falling back to generic ledger vouchers.
 7. When entities are referenced by number or code (product numbers, account numbers, employee emails), look them up and include their ID as a reference on the object. For example, order lines must include "product":{{"id":N}} when a product number is given.
 8. When a task specifies multiple line items (products, salary components, expenses), keep them as separate lines — one per item. Do not merge them into a single total.
