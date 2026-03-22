@@ -86,15 +86,18 @@ async def run_agent(prompt: str, files: list, credentials: dict) -> None:
 
         agent_prompt = build_agent_prompt(prompt, files)
 
+        allowed_tools = [
+            "mcp__tripletex__tripletex",
+            "mcp__tripletex__setup",
+        ]
+        if files:
+            allowed_tools.append("Read")
+
         options = ClaudeCodeOptions(
             append_system_prompt=get_system_prompt(),
             model="sonnet",
             continue_conversation=False,
-            allowed_tools=[
-                "mcp__tripletex__tripletex",
-                "mcp__tripletex__setup",
-                "Read",
-            ],
+            allowed_tools=allowed_tools,
             mcp_servers={
                 "tripletex": McpStdioServerConfig(
                     command="python",
@@ -106,6 +109,7 @@ async def run_agent(prompt: str, files: list, credentials: dict) -> None:
                 ),
             },
             disallowed_tools=[
+                "ToolSearch",
                 "AskUserQuestion",
                 "Bash",
                 "Write",

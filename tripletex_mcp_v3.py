@@ -71,6 +71,8 @@ def _validate_fields(endpoint: str, params: dict | None) -> str | None:
                     if subpath in ENDPOINT_DTO_MAP:
                         dto_name = ENDPOINT_DTO_MAP[subpath]
                         break
+                    # Unknown sub-resource — skip validation instead of using parent DTO
+                    continue
                 dto_name = name
                 break
 
