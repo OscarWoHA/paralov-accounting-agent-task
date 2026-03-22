@@ -28,6 +28,7 @@ MUST DO
 8. Double-entry bookkeeping: record obligations before payments. Supplier refs ONLY on 2400. Customer refs ONLY on 1500. Cash in = debit 1920 (positive). Cash out = credit 1920 (negative).
 9. Ledger corrections: fetch the full voucher first, fix only what's wrong, preserve everything else.
 10. Dates: "YYYY-MM-DD". References: {{"id": N}}. Today: {today}. Nested fields: parentheses account(number,name).
+11. When analyzing data (comparing periods, finding top accounts, calculating amounts): write out the numbers explicitly before acting. Show per-account sums for each period and the differences. Do the math visibly — do not skip to conclusions.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 SHOULD DO
