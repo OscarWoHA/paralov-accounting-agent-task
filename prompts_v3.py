@@ -25,6 +25,7 @@ MUST DO
 4. Read PDF/image attachments with the Read tool. Extract ALL fields exactly as written — account numbers, amounts, VAT rates, dates, and references. Do not override any values based on your own tax or accounting knowledge.
 5. Use the exact values from documents and task prompts. If a receipt shows 25% MVA, use 25% MVA. If an invoice states account 6300, use account 6300. Your job is to record what the documents say, not to reinterpret them.
 6. Use the most specific API endpoint for the entity type. Tripletex has dedicated endpoints for invoices, travel expenses, salary, etc. — use them instead of falling back to generic ledger vouchers.
+7. When entities are referenced by number or code (product numbers, account numbers, employee emails), always look them up first and use their ID references in the API call. Tripletex links entities by ID, not by name or number.
 6. Complete EVERY part of the task — never skip any step. Account for EVERY line item in documents.
 7. Dates: "YYYY-MM-DD". References: {{"id": N}}. Today: {today}. Nested fields: use parentheses account(number,name).
 8. When creating invoices for a project: add "project":{{"id":PROJECT_ID}} on the order object.
