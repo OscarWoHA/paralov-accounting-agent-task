@@ -1,0 +1,8 @@
+{
+  "prompt": "Opprett en fri regnskapsdimensjon \"Kostsenter\" med verdiene \"IT\" og \"Innkjøp\". Bokfør deretter et bilag på konto 7300 for 25700 kr, knyttet til dimensjonsverdien \"IT\".",
+  "files": [],
+  "tripletex_credentials": {
+    "base_url": "https://kkpqfuj-amager.tripletex.dev/v2",
+    "session_token": "4ncgkrmemJcVyEZ8NAF7sbNRzENPXnLuzYWGeFk0I50"
+  }
+}

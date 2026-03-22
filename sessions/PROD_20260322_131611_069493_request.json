@@ -1,0 +1,8 @@
+{
+  "prompt": "El pago de Solmar SL (org. nº 840739201) por la factura \"Horas de consultoría\" (40550 NOK sin IVA) fue devuelto por el banco. Revierta el pago para que la factura vuelva a mostrar el importe pendiente.",
+  "files": [],
+  "tripletex_credentials": {
+    "base_url": "https://tx-proxy-jwanbnu3pq-lz.a.run.app/v2",
+    "session_token": "7ZcnBodLLa1uqp8InaLvM6V4Rww0h1KzSMZEKQ67e-c"
+  }
+}

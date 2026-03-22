@@ -1,0 +1,8 @@
+{
+  "prompt": "Créez le client Prairie SARL avec le numéro d'organisation 810704780. L'adresse est Storgata 97, 5003 Bergen. E-mail : post@prairie.no.",
+  "files": [],
+  "tripletex_credentials": {
+    "base_url": "https://kkpqfuj-amager.tripletex.dev/v2",
+    "session_token": "TEZ_zr3gYxH2LVX58QDEMmsPjM8bWTjHQXqs6fGIiWk"
+  }
+}

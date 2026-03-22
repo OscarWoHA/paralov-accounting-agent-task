@@ -1,0 +1,8 @@
+{
+  "prompt": "Enregistrez 15 heures pour Nathan Bernard (nathan.bernard@example.org) sur l'activité \"Utvikling\" du projet \"Développement d'app\" pour Colline SARL (nº org. 815345991). Taux horaire : 1000 NOK/h. Générez une facture de projet au client basée sur les heures enregistrées.",
+  "files": [],
+  "tripletex_credentials": {
+    "base_url": "https://tx-proxy-jwanbnu3pq-lz.a.run.app/v2",
+    "session_token": "MZTdiY8GWhYjjWru8hqutl6e0qE19qaL6uwUb5kGVAc"
+  }
+}

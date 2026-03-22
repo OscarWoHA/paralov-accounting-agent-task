@@ -1,0 +1,8 @@
+{
+  "prompt": "Créez une facture pour le client Prairie SARL (nº org. 819432589) avec trois lignes de produit : Développement système (8130) à 11850 NOK avec 25 % TVA, Stockage cloud (4606) à 5650 NOK avec 15 % TVA (alimentaire), et Conseil en données (8977) à 19000 NOK avec 0 % TVA (exonéré).",
+  "files": [],
+  "tripletex_credentials": {
+    "base_url": "https://tx-proxy-jwanbnu3pq-lz.a.run.app/v2",
+    "session_token": "L9SaLRDHY0mrUwt9dll8qcID0wBTiSUMzRim4yVBn8s"
+  }
+}

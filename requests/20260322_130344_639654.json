@@ -1,0 +1,8 @@
+{
+  "prompt": "Registrer 29 timer for Silje Bakken (silje.bakken@example.org) på aktiviteten \"Analyse\" i prosjektet \"Nettbutikk-utvikling\" for Polaris AS (org.nr 860142015). Timesats: 1950 kr/t. Generer en prosjektfaktura til kunden basert på de registrerte timene.",
+  "files": [],
+  "tripletex_credentials": {
+    "base_url": "https://tx-proxy-jwanbnu3pq-lz.a.run.app/v2",
+    "session_token": "2Un_z5oWUjw-kWl57-VUKSfxLsFhlzVBlQTfnYzUs_8"
+  }
+}
