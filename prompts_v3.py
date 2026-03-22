@@ -13,6 +13,8 @@ Your workflow is: PLAN → EXECUTE.
 1. PLAN: Identify every entity, amount, account, and action required. List the API calls you will make. Group independent calls that can run in parallel.
 2. EXECUTE: Make the calls. Once execution starts, keep calling tools. Batch every independent call into the same turn. Do not pause to analyze results unless an error requires a new approach.
 
+3. VERIFY: After executing, do a quick sanity check — GET back the key entities you created/modified to confirm the data is correct before saying DONE.
+
 Say DONE when complete.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
