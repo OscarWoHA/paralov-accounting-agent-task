@@ -146,6 +146,7 @@ def setup(action: str) -> str:
       ensure_bank_account  — Checks account 1920 and sets bankAccountNumber if empty. MUST call before creating invoices.
       ensure_vat_registered — Registers for VAT if not already registered.
       whoami               — Returns company info (company ID needed for admin entitlements).
+      init                 — Returns all common reference data in ONE call: bank account setup + voucherTypes + paymentTypes + departments. Call this FIRST to save multiple lookups.
     """
     if action == "ensure_bank_account":
         r = tripletex("GET", "/ledger/account", params={"number": "1920", "fields": "id,version,bankAccountNumber"})
@@ -174,6 +175,49 @@ def setup(action: str) -> str:
         return r
     elif action == "whoami":
         return tripletex("GET", "/token/session/>whoAmI")
+    elif action == "init":
+        # One call that returns everything the agent commonly needs
+        results = {}
+
+        # 1. Ensure bank account
+        bank_r = tripletex("GET", "/ledger/account", params={"number": "1920", "fields": "id,version,bankAccountNumber"})
+        bank_data = json.loads(bank_r)
+        if bank_data.get("status_code") == 200:
+            values = bank_data.get("body", {}).get("values", [])
+            if values and not values[0].get("bankAccountNumber"):
+                acc = values[0]
+                tripletex("PUT", f"/ledger/account/{acc['id']}", body={
+                    "id": acc["id"], "version": acc["version"], "bankAccountNumber": "28002111480"
+                })
+                results["bankAccount"] = "configured"
+            elif values:
+                results["bankAccount"] = "already configured"
+
+        # 2. Voucher types
+        vt_r = tripletex("GET", "/ledger/voucherType", params={"fields": "id,name"})
+        vt_data = json.loads(vt_r)
+        if vt_data.get("status_code") == 200:
+            results["voucherTypes"] = {v["name"]: v["id"] for v in vt_data.get("body", {}).get("values", [])}
+
+        # 3. Invoice payment types
+        pt_r = tripletex("GET", "/invoice/paymentType", params={"fields": "id,description"})
+        pt_data = json.loads(pt_r)
+        if pt_data.get("status_code") == 200:
+            results["paymentTypes"] = {v["description"]: v["id"] for v in pt_data.get("body", {}).get("values", [])}
+
+        # 4. Departments
+        dept_r = tripletex("GET", "/department", params={"fields": "id,name,departmentNumber"})
+        dept_data = json.loads(dept_r)
+        if dept_data.get("status_code") == 200:
+            results["departments"] = {v["name"]: v["id"] for v in dept_data.get("body", {}).get("values", [])}
+
+        # 5. Employees (first 10)
+        emp_r = tripletex("GET", "/employee", params={"fields": "id,firstName,lastName,email", "count": "10"})
+        emp_data = json.loads(emp_r)
+        if emp_data.get("status_code") == 200:
+            results["employees"] = [{"id": v["id"], "name": f"{v['firstName']} {v['lastName']}", "email": v.get("email","")} for v in emp_data.get("body", {}).get("values", [])]
+
+        return json.dumps({"status_code": 200, "body": results}, ensure_ascii=False)
     else:
         return json.dumps({"error": f"Unknown action: {action}"})
 
